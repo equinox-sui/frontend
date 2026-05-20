@@ -1,25 +1,25 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { Hero } from "@/components/sections/Hero";
-import { PartnerMarquee } from "@/components/sections/PartnerMarquee";
-import { HowItWorks } from "@/components/sections/HowItWorks";
-import { Concepts } from "@/components/sections/Concepts";
-import { WhyEquinox } from "@/components/sections/WhyEquinox";
-import { TrustSignals } from "@/components/sections/TrustSignals";
-import { CallToAction } from "@/components/sections/CallToAction";
+import { Navbar } from "@/components/landing/navbar";
+import { Footer } from "@/components/landing/footer";
+import { Hero } from "@/components/landing/sections/hero";
+import { HowAuralis } from "@/components/landing/sections/how-auralis";
+import { WhatYouCanDo } from "@/components/landing/sections/what-you-can-do";
+import { SecurityIntegrations } from "@/components/landing/sections/security-integrations";
+import { FAQ } from "@/components/landing/sections/faq";
+import { Academy } from "@/components/landing/sections/academy";
+import { StartCTA } from "@/components/landing/sections/start-cta";
 
 export default function Page() {
   return (
     <>
       <Navbar />
-      <main className="flex-1">
+      <main className="relative flex-1">
         <Hero />
-        <PartnerMarquee />
-        <HowItWorks />
-        <Concepts />
-        <WhyEquinox />
-        <TrustSignals />
-        <CallToAction />
+        <HowAuralis />
+        <WhatYouCanDo />
+        <SecurityIntegrations />
+        <FAQ />
+        <Academy />
+        <StartCTA />
       </main>
       <Footer />
     </>
