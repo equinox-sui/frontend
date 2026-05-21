@@ -1,24 +1,27 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap } from "@/lib/gsap";
 import { hero } from "@/lib/content";
 import { cn } from "@/lib/cn";
-import { Entropy } from "../ui/entropy";
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
+  const floatRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       registerGsap();
+
+      // Hero copy entrance
       const tl = gsap.timeline({
         defaults: { ease: "expo.out", duration: 1 },
       });
-
       tl.fromTo(
         ".hero-word",
         { opacity: 0, y: 26 },
@@ -38,10 +41,98 @@ export function Hero() {
         )
         .fromTo(
           ".hero-field",
-          { opacity: 0, scale: 0.96 },
-          { opacity: 1, scale: 1, duration: 1.4, ease: "expo.out" },
-          "-=0.8"
+          { opacity: 0, scale: 0.86, rotation: -8, y: 28 },
+          {
+            opacity: 1,
+            scale: 1,
+            rotation: 0,
+            y: 0,
+            duration: 1.4,
+            ease: "expo.out",
+          },
+          "-=0.85"
         );
+
+      // Continuous gentle bobbing on the coin
+      gsap.to("[data-float]", {
+        y: -16,
+        duration: 3.6,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
+      // Slow rotation on the orbiting ring
+      gsap.to("[data-orbit]", {
+        rotation: 360,
+        duration: 32,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "50% 50%",
+      });
+
+      // Counter-rotation on the inner accent
+      gsap.to("[data-orbit-inner]", {
+        rotation: -360,
+        duration: 22,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "50% 50%",
+      });
+
+      // Breathing glow behind the image
+      gsap.to("[data-glow]", {
+        opacity: 1,
+        scale: 1.12,
+        duration: 2.6,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
+      // Twinkle on the satellite dots
+      gsap.utils.toArray<HTMLElement>("[data-twinkle]").forEach((el, i) => {
+        gsap.to(el, {
+          opacity: 0.35,
+          duration: 1.4 + (i % 3) * 0.4,
+          delay: i * 0.18,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+        });
+      });
+
+      // Mouse-parallax tilt on the entire field
+      const field = fieldRef.current;
+      const float = floatRef.current;
+      if (field && float) {
+        const onMove = (e: MouseEvent) => {
+          const r = field.getBoundingClientRect();
+          const nx = (e.clientX - r.left) / r.width - 0.5;
+          const ny = (e.clientY - r.top) / r.height - 0.5;
+          gsap.to(float, {
+            rotationY: nx * 14,
+            rotationX: -ny * 10,
+            duration: 0.9,
+            ease: "power3.out",
+            transformPerspective: 1000,
+          });
+        };
+        const onLeave = () => {
+          gsap.to(float, {
+            rotationX: 0,
+            rotationY: 0,
+            duration: 1.1,
+            ease: "elastic.out(1, 0.6)",
+          });
+        };
+        field.addEventListener("mousemove", onMove);
+        field.addEventListener("mouseleave", onLeave);
+        return () => {
+          field.removeEventListener("mousemove", onMove);
+          field.removeEventListener("mouseleave", onLeave);
+        };
+      }
     },
     { scope: ref }
   );
@@ -119,16 +210,162 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Right — Entropy particle field */}
-        <div className="hero-field relative mx-auto flex w-full max-w-[420px] origin-center scale-[0.82] items-center justify-center sm:max-w-[480px] sm:scale-100 lg:order-2 lg:mx-0 lg:max-w-none lg:justify-end">
-          <Entropy size={540} className="rounded-[2rem] !bg-transparent" />
+        {/* Right — animated coin field */}
+        <div
+          ref={fieldRef}
+          className="hero-field relative mx-auto flex aspect-square w-full max-w-[420px] origin-center items-center justify-center sm:max-w-[480px] lg:order-2 lg:mx-0 lg:max-w-[540px] lg:justify-end"
+          style={{ perspective: 1200 }}
+        >
+          {/* Breathing glow behind */}
           <div
+            data-glow
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-[3rem]"
+            className="absolute inset-[10%] rounded-full opacity-70"
             style={{
               background:
-                "radial-gradient(60% 50% at 50% 40%, rgba(145,129,245,0.10), transparent 70%)",
+                "radial-gradient(circle, rgba(64,122,255,0.55) 0%, rgba(64,122,255,0.18) 40%, transparent 70%)",
+              filter: "blur(28px)",
             }}
+          />
+
+          {/* Slow rotating decorative ring */}
+          <svg
+            data-orbit
+            aria-hidden
+            viewBox="0 0 400 400"
+            className="absolute inset-0 h-full w-full"
+            style={{ willChange: "transform" }}
+          >
+            <defs>
+              <linearGradient id="orbit-stroke" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.0)" />
+                <stop offset="35%" stopColor="rgba(145,129,245,0.55)" />
+                <stop offset="65%" stopColor="rgba(64,122,255,0.45)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0.0)" />
+              </linearGradient>
+            </defs>
+            <circle
+              cx="200"
+              cy="200"
+              r="186"
+              fill="none"
+              stroke="url(#orbit-stroke)"
+              strokeWidth="1.2"
+              strokeDasharray="2 6"
+            />
+            <circle
+              cx="200"
+              cy="14"
+              r="3"
+              fill="#fff"
+              style={{ filter: "drop-shadow(0 0 6px rgba(145,129,245,0.9))" }}
+            />
+            <circle
+              cx="386"
+              cy="200"
+              r="2"
+              fill="#fff"
+              opacity="0.7"
+              style={{ filter: "drop-shadow(0 0 4px rgba(64,122,255,0.8))" }}
+            />
+          </svg>
+
+          {/* Counter-rotating inner accent */}
+          <svg
+            data-orbit-inner
+            aria-hidden
+            viewBox="0 0 400 400"
+            className="absolute inset-[12%] h-[76%] w-[76%]"
+            style={{ willChange: "transform" }}
+          >
+            <circle
+              cx="200"
+              cy="200"
+              r="170"
+              fill="none"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="1"
+            />
+            <circle
+              cx="370"
+              cy="200"
+              r="2.5"
+              fill="rgba(228,243,61,0.95)"
+              style={{ filter: "drop-shadow(0 0 5px rgba(228,243,61,0.9))" }}
+            />
+            <circle
+              cx="30"
+              cy="200"
+              r="1.6"
+              fill="rgba(255,255,255,0.8)"
+            />
+          </svg>
+
+          {/* Floating coin — main image with tilt */}
+          <div
+            ref={floatRef}
+            className="relative h-[72%] w-[72%] will-change-transform"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <div data-float className="relative h-full w-full">
+              <Image
+                src="/bg-home.png"
+                alt="Sui — built natively on Sui"
+                fill
+                priority
+                sizes="(max-width: 768px) 80vw, 480px"
+                className="rounded-[28%] object-cover"
+                style={{
+                  boxShadow:
+                    "0 40px 80px -20px rgba(64,122,255,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 60px -10px rgba(145,129,245,0.4)",
+                }}
+              />
+              {/* Specular highlight overlay */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-[28%]"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 60%, rgba(64,122,255,0.12) 100%)",
+                  mixBlendMode: "screen",
+                }}
+              />
+              {/* Inner ring */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-1 rounded-[26%] border border-white/10"
+              />
+            </div>
+          </div>
+
+          {/* Satellite twinkling dots */}
+          <span
+            data-twinkle
+            aria-hidden
+            className="absolute left-[8%] top-[24%] size-1 rounded-full bg-white"
+            style={{ filter: "drop-shadow(0 0 6px rgba(255,255,255,0.9))" }}
+          />
+          <span
+            data-twinkle
+            aria-hidden
+            className="absolute right-[12%] top-[18%] size-1.5 rounded-full bg-violet-soft"
+            style={{ filter: "drop-shadow(0 0 8px rgba(145,129,245,0.9))" }}
+          />
+          <span
+            data-twinkle
+            aria-hidden
+            className="absolute right-[6%] bottom-[28%] size-1 rounded-full bg-white"
+          />
+          <span
+            data-twinkle
+            aria-hidden
+            className="absolute left-[14%] bottom-[16%] size-1.5 rounded-full bg-[#5cd8ff]"
+            style={{ filter: "drop-shadow(0 0 8px rgba(92,216,255,0.85))" }}
+          />
+          <span
+            data-twinkle
+            aria-hidden
+            className="absolute left-[42%] top-[6%] size-[3px] rounded-full bg-white"
           />
         </div>
       </div>
