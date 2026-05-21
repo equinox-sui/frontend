@@ -9,30 +9,6 @@ import { gsap, registerGsap } from "@/lib/gsap";
 import { hero } from "@/lib/content";
 import { cn } from "@/lib/cn";
 
-const CHIPS = [
-  {
-    label: "Collateral",
-    value: "1,000 SUI",
-    dot: "#5cd8ff",
-    pos: { top: "6%", left: "-2%" },
-    delay: 0,
-  },
-  {
-    label: "Borrow",
-    value: "$1,925 USDC",
-    dot: "#ff7a90",
-    pos: { top: "44%", right: "-6%" },
-    delay: 0.4,
-  },
-  {
-    label: "Spread · auto-repay",
-    value: "+$0.42 / hr",
-    dot: "#9181f5",
-    pos: { bottom: "4%", left: "6%" },
-    delay: 0.8,
-  },
-];
-
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
@@ -63,103 +39,140 @@ export function Hero() {
         )
         .fromTo(
           ".hero-field",
-          { opacity: 0, scale: 0.88, y: 24 },
-          { opacity: 1, scale: 1, y: 0, duration: 1.3, ease: "expo.out" },
+          { opacity: 0, scale: 0.86, rotation: -8, y: 28 },
+          {
+            opacity: 1,
+            scale: 1,
+            rotation: 0,
+            y: 0,
+            duration: 1.4,
+            ease: "expo.out",
+          },
           "-=0.85"
         );
 
-      // === Chip entrance + idle drift ===
-      gsap.utils.toArray<HTMLElement>("[data-chip]").forEach((el, i) => {
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 12, scale: 0.92 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.7,
-            delay: 1.2 + i * 0.2,
-            ease: "expo.out",
-          }
-        );
-        gsap.to(el, {
-          y: (i % 2 === 0 ? -1 : 1) * 8,
-          duration: 4 + i * 0.5,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-          delay: 1.6 + i * 0.2,
-        });
-      });
-
-      // === Coin idle ===
+      // === Coin idle motion ===
+      // Vertical bob
       gsap.to("[data-float]", {
-        y: -14,
+        y: -16,
         duration: 3.6,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
+      // Subtle constant Z-sway (rotation around vertical)
       gsap.to("[data-float]", {
-        rotateZ: 1.2,
+        rotateZ: 1.6,
         duration: 6.2,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
-
-      // === Comet trail on Saturn ring (stroke-dashoffset orbit) ===
-      gsap.to("[data-comet]", {
-        strokeDashoffset: -1170, // approx circumference of r=186
-        duration: 6,
-        ease: "none",
+      // Heartbeat scale every 4s
+      gsap.to("[data-coin-pulse]", {
+        scale: 1.025,
+        duration: 0.8,
+        ease: "sine.inOut",
+        yoyo: true,
         repeat: -1,
+        repeatDelay: 3,
       });
 
-      // === Outer faint ring slow rotation ===
-      gsap.to("[data-orbit-outer]", {
+      // === Orbit ring rotations ===
+      gsap.to("[data-orbit]", {
         rotation: 360,
-        duration: 60,
+        duration: 32,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "50% 50%",
+      });
+      gsap.to("[data-orbit-inner]", {
+        rotation: -360,
+        duration: 22,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "50% 50%",
+      });
+      gsap.to("[data-orbit-tilted]", {
+        rotation: 360,
+        duration: 26,
         ease: "none",
         repeat: -1,
         transformOrigin: "50% 50%",
       });
 
-      // === Aurora breathing ===
-      gsap.to("[data-aurora]", {
+      // === Conic backsplash sweep ===
+      gsap.to("[data-conic]", {
+        rotation: 360,
+        duration: 18,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "50% 50%",
+      });
+
+      // === Sonar pulses (3, staggered) ===
+      gsap.utils.toArray<HTMLElement>("[data-sonar]").forEach((el, i) => {
+        gsap.fromTo(
+          el,
+          { scale: 0.55, opacity: 0.65 },
+          {
+            scale: 1.55,
+            opacity: 0,
+            duration: 3.8,
+            ease: "power2.out",
+            repeat: -1,
+            delay: i * 1.3,
+          }
+        );
+      });
+
+      // === Glow breathing ===
+      gsap.to("[data-glow]", {
         opacity: 1,
-        scale: 1.1,
-        duration: 3.2,
+        scale: 1.14,
+        duration: 2.6,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       });
 
-      // === Spread-rate counter pulse ===
-      gsap.utils.toArray<HTMLElement>("[data-chip-dot]").forEach((el, i) => {
+      // === Drifting micro-particles (per-element random paths) ===
+      gsap.utils.toArray<HTMLElement>("[data-drift]").forEach((el, i) => {
+        const dur = 5 + (i % 4) * 1.4;
+        const dx = (i % 2 === 0 ? 1 : -1) * (8 + (i % 3) * 6);
+        const dy = (i % 3 === 0 ? -1 : 1) * (10 + (i % 4) * 5);
+        gsap.to(el, {
+          x: dx,
+          y: dy,
+          duration: dur,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: i * 0.2,
+        });
+        gsap.to(el, {
+          opacity: 0.3,
+          duration: 1.2 + (i % 3) * 0.4,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: i * 0.15,
+        });
+      });
+
+      // === Twinkles on satellite stars ===
+      gsap.utils.toArray<HTMLElement>("[data-twinkle]").forEach((el, i) => {
         gsap.to(el, {
           opacity: 0.35,
-          duration: 1.4,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-          delay: i * 0.5,
-        });
-      });
-
-      // === Star twinkles ===
-      gsap.utils.toArray<HTMLElement>("[data-star]").forEach((el, i) => {
-        gsap.to(el, {
-          opacity: 0.25,
-          duration: 1.6 + (i % 3) * 0.4,
-          delay: i * 0.3,
+          duration: 1.4 + (i % 3) * 0.4,
+          delay: i * 0.18,
           ease: "sine.inOut",
           yoyo: true,
           repeat: -1,
         });
       });
 
-      // === Mouse-parallax tilt + cursor light + hover ===
+      // === Mouse-parallax tilt + cursor-following glow + hover scale ===
       const field = fieldRef.current;
       const float = floatRef.current;
       if (field && float) {
@@ -168,14 +181,14 @@ export function Hero() {
           const nx = (e.clientX - r.left) / r.width - 0.5;
           const ny = (e.clientY - r.top) / r.height - 0.5;
           gsap.to(float, {
-            rotationY: nx * 14,
-            rotationX: -ny * 10,
+            rotationY: nx * 16,
+            rotationX: -ny * 12,
             duration: 0.9,
             ease: "power3.out",
             transformPerspective: 1000,
           });
-          field.style.setProperty("--cx", `${((e.clientX - r.left) / r.width) * 100}%`);
-          field.style.setProperty("--cy", `${((e.clientY - r.top) / r.height) * 100}%`);
+          field.style.setProperty("--cx", `${(e.clientX - r.left) / r.width * 100}%`);
+          field.style.setProperty("--cy", `${(e.clientY - r.top) / r.height * 100}%`);
         };
         const onLeave = () => {
           gsap.to(float, {
@@ -187,19 +200,19 @@ export function Hero() {
           field.style.setProperty("--cx", `50%`);
           field.style.setProperty("--cy", `50%`);
         };
-        const onCoinEnter = () => {
+        const onEnter = () => {
           gsap.to("[data-coin-pulse]", {
-            scale: 1.04,
-            duration: 0.7,
+            scale: 1.05,
+            duration: 0.8,
             ease: "power3.out",
           });
-          gsap.to("[data-aurora]", {
-            opacity: 1.15,
-            duration: 0.7,
+          gsap.to("[data-glow]", {
+            opacity: 1.1,
+            duration: 0.8,
             ease: "power2.out",
           });
         };
-        const onCoinLeave = () => {
+        const onLeaveCoin = () => {
           gsap.to("[data-coin-pulse]", {
             scale: 1,
             duration: 1,
@@ -208,13 +221,13 @@ export function Hero() {
         };
         field.addEventListener("mousemove", onMove);
         field.addEventListener("mouseleave", onLeave);
-        float.addEventListener("mouseenter", onCoinEnter);
-        float.addEventListener("mouseleave", onCoinLeave);
+        float.addEventListener("mouseenter", onEnter);
+        float.addEventListener("mouseleave", onLeaveCoin);
         return () => {
           field.removeEventListener("mousemove", onMove);
           field.removeEventListener("mouseleave", onLeave);
-          float.removeEventListener("mouseenter", onCoinEnter);
-          float.removeEventListener("mouseleave", onCoinLeave);
+          float.removeEventListener("mouseenter", onEnter);
+          float.removeEventListener("mouseleave", onLeaveCoin);
         };
       }
     },
@@ -294,7 +307,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Right — clean coin field */}
+        {/* Right — animated coin field */}
         <div
           ref={fieldRef}
           className="hero-field relative mx-auto flex aspect-square w-full max-w-[420px] origin-center items-center justify-center sm:max-w-[480px] lg:order-2 lg:mx-0 lg:max-w-[540px] lg:justify-end"
@@ -304,107 +317,167 @@ export function Hero() {
             ["--cy" as string]: "50%",
           } as React.CSSProperties}
         >
-          {/* Aurora glow (single, diffuse, breathing) */}
+          {/* Conic gradient backsplash sweep — rotates slowly */}
           <div
-            data-aurora
+            data-conic
             aria-hidden
-            className="absolute inset-[8%] rounded-full opacity-80 will-change-transform"
+            className="absolute inset-[4%] rounded-full opacity-50 will-change-transform"
             style={{
               background:
-                "radial-gradient(60% 50% at 50% 50%, rgba(145,129,245,0.45) 0%, rgba(255,122,144,0.18) 40%, transparent 75%)",
-              filter: "blur(36px)",
+                "conic-gradient(from 0deg, transparent 0deg, rgba(145,129,245,0.22) 60deg, rgba(255,122,144,0.22) 140deg, rgba(92,216,255,0.22) 220deg, transparent 320deg)",
+              filter: "blur(38px)",
+              maskImage:
+                "radial-gradient(circle, black 30%, transparent 70%)",
+              WebkitMaskImage:
+                "radial-gradient(circle, black 30%, transparent 70%)",
             }}
           />
 
-          {/* Cursor light */}
+          {/* Breathing glow behind */}
           <div
+            data-glow
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-full transition-opacity duration-500"
+            className="absolute inset-[10%] rounded-full opacity-70"
             style={{
               background:
-                "radial-gradient(220px circle at var(--cx) var(--cy), rgba(255,255,255,0.07), transparent 60%)",
+                "radial-gradient(circle, rgba(255,122,144,0.45) 0%, rgba(145,129,245,0.28) 40%, transparent 72%)",
+              filter: "blur(32px)",
             }}
           />
 
-          {/* Outer faint dashed circle, slow */}
+          {/* Cursor-following light */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-full opacity-60 transition-opacity duration-500"
+            style={{
+              background:
+                "radial-gradient(220px circle at var(--cx) var(--cy), rgba(255,255,255,0.06), transparent 60%)",
+            }}
+          />
+
+          {/* Sonar pulse waves — 3 expanding circles */}
+          {[0, 1, 2].map((i) => (
+            <div
+              key={`sonar-${i}`}
+              data-sonar
+              aria-hidden
+              className="absolute inset-[14%] rounded-full will-change-transform"
+              style={{
+                border: "1px solid rgba(145,129,245,0.45)",
+                boxShadow:
+                  "0 0 22px rgba(145,129,245,0.18), inset 0 0 22px rgba(255,122,144,0.12)",
+              }}
+            />
+          ))}
+
+          {/* Outer rotating dashed ring */}
           <svg
-            data-orbit-outer
+            data-orbit
             aria-hidden
             viewBox="0 0 400 400"
             className="absolute inset-0 h-full w-full will-change-transform"
           >
+            <defs>
+              <linearGradient id="orbit-stroke" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.0)" />
+                <stop offset="35%" stopColor="rgba(145,129,245,0.55)" />
+                <stop offset="65%" stopColor="rgba(92,216,255,0.55)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0.0)" />
+              </linearGradient>
+            </defs>
             <circle
               cx="200"
               cy="200"
               r="186"
               fill="none"
-              stroke="rgba(255,255,255,0.07)"
-              strokeWidth="1"
-              strokeDasharray="1 8"
+              stroke="url(#orbit-stroke)"
+              strokeWidth="1.2"
+              strokeDasharray="2 6"
+            />
+            <circle
+              cx="200"
+              cy="14"
+              r="3.2"
+              fill="#fff"
+              style={{ filter: "drop-shadow(0 0 6px rgba(145,129,245,0.9))" }}
+            />
+            <circle
+              cx="386"
+              cy="200"
+              r="2"
+              fill="#fff"
+              opacity="0.7"
+              style={{ filter: "drop-shadow(0 0 4px rgba(92,216,255,0.8))" }}
             />
           </svg>
 
-          {/* Saturn-tilted ring with comet trail (the focal motion) */}
-          <div
+          {/* Tilted Saturn-style ring — rotated on Y axis so it appears elliptical */}
+          <svg
+            data-orbit-tilted
             aria-hidden
+            viewBox="0 0 400 400"
             className="absolute inset-[-2%] h-[104%] w-[104%] will-change-transform"
-            style={{ transform: "rotateX(70deg)" }}
+            style={{ transform: "rotateX(72deg)" }}
           >
-            <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full">
-              <defs>
-                <linearGradient
-                  id="comet-gradient"
-                  x1="0%"
-                  x2="100%"
-                  y1="0%"
-                  y2="0%"
-                >
-                  <stop offset="0%" stopColor="rgba(255,122,144,0)" />
-                  <stop offset="60%" stopColor="rgba(255,122,144,0.45)" />
-                  <stop offset="100%" stopColor="rgba(145,129,245,1)" />
-                </linearGradient>
-              </defs>
-              {/* Base ring */}
-              <circle
-                cx="200"
-                cy="200"
-                r="186"
-                fill="none"
-                stroke="rgba(255,255,255,0.08)"
-                strokeWidth="1.2"
-              />
-              {/* Comet trail */}
-              <circle
-                data-comet
-                cx="200"
-                cy="200"
-                r="186"
-                fill="none"
-                stroke="url(#comet-gradient)"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeDasharray="120 1050"
-                strokeDashoffset="0"
-                style={{ filter: "drop-shadow(0 0 6px rgba(145,129,245,0.8))" }}
-              />
-            </svg>
-          </div>
+            <circle
+              cx="200"
+              cy="200"
+              r="194"
+              fill="none"
+              stroke="rgba(255,122,144,0.35)"
+              strokeWidth="1.3"
+              strokeDasharray="1 5"
+            />
+            <circle
+              cx="200"
+              cy="6"
+              r="2.6"
+              fill="#ff7a90"
+              style={{ filter: "drop-shadow(0 0 6px rgba(255,122,144,0.9))" }}
+            />
+            <circle
+              cx="200"
+              cy="394"
+              r="2"
+              fill="#ff7a90"
+              opacity="0.7"
+            />
+          </svg>
 
-          {/* Floor reflection beneath the coin */}
-          <div
+          {/* Counter-rotating inner accent */}
+          <svg
+            data-orbit-inner
             aria-hidden
-            className="pointer-events-none absolute bottom-[8%] left-1/2 h-[6%] w-[55%] -translate-x-1/2 rounded-full opacity-70"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(255,122,144,0.35) 0%, rgba(92,216,255,0.18) 45%, transparent 75%)",
-              filter: "blur(10px)",
-            }}
-          />
+            viewBox="0 0 400 400"
+            className="absolute inset-[12%] h-[76%] w-[76%] will-change-transform"
+          >
+            <circle
+              cx="200"
+              cy="200"
+              r="170"
+              fill="none"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="1"
+            />
+            <circle
+              cx="370"
+              cy="200"
+              r="2.6"
+              fill="rgba(228,243,61,0.95)"
+              style={{ filter: "drop-shadow(0 0 6px rgba(228,243,61,0.9))" }}
+            />
+            <circle
+              cx="30"
+              cy="200"
+              r="1.6"
+              fill="rgba(255,255,255,0.8)"
+            />
+          </svg>
 
-          {/* Floating coin */}
+          {/* Floating coin — main image with tilt */}
           <div
             ref={floatRef}
-            className="relative z-10 h-[64%] w-[64%] cursor-pointer will-change-transform"
+            className="relative h-[72%] w-[72%] cursor-pointer will-change-transform"
             style={{ transformStyle: "preserve-3d" }}
           >
             <div data-float className="relative h-full w-full">
@@ -418,20 +491,30 @@ export function Hero() {
                   className="rounded-[28%] object-cover"
                   style={{
                     boxShadow:
-                      "0 40px 80px -20px rgba(255,122,144,0.4), 0 0 0 1px rgba(255,255,255,0.08) inset, 0 0 60px -10px rgba(92,216,255,0.4)",
+                      "0 40px 80px -20px rgba(255,122,144,0.4), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 60px -10px rgba(92,216,255,0.4)",
                   }}
                 />
-                {/* Specular */}
+                {/* Specular highlight overlay */}
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0 rounded-[28%]"
                   style={{
                     background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 62%, rgba(92,216,255,0.12) 100%)",
+                      "linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 60%, rgba(92,216,255,0.14) 100%)",
                     mixBlendMode: "screen",
                   }}
                 />
-                {/* Inner stroke */}
+                {/* Conic shimmer that catches the light on tilt */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 rounded-[28%] opacity-50"
+                  style={{
+                    background:
+                      "conic-gradient(from 220deg at 30% 0%, transparent 0deg, rgba(255,255,255,0.15) 24deg, transparent 60deg)",
+                    mixBlendMode: "screen",
+                  }}
+                />
+                {/* Inner ring */}
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-1 rounded-[26%] border border-white/10"
@@ -440,72 +523,45 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Floating product chips — give the coin context */}
-          {CHIPS.map((c) => (
-            <div
-              key={c.label}
-              data-chip
-              className="absolute z-20 rounded-full border border-white/[0.08] bg-[#0f0f0f]/85 px-3.5 py-2 backdrop-blur-md will-change-transform"
+          {/* Drifting micro-particles */}
+          {[
+            { left: "8%", top: "30%", size: 3, color: "#fff" },
+            { left: "82%", top: "18%", size: 4, color: "#9181f5" },
+            { left: "88%", top: "62%", size: 3, color: "#5cd8ff" },
+            { left: "14%", top: "74%", size: 4, color: "#ff7a90" },
+            { left: "50%", top: "4%", size: 2.5, color: "#fff" },
+            { left: "6%", top: "52%", size: 2.5, color: "#5cd8ff" },
+            { left: "94%", top: "40%", size: 2, color: "#fff" },
+            { left: "60%", top: "94%", size: 3.5, color: "#9181f5" },
+          ].map((p, i) => (
+            <span
+              key={`drift-${i}`}
+              data-drift
+              aria-hidden
+              className="absolute rounded-full will-change-transform"
               style={{
-                ...c.pos,
-                boxShadow:
-                  "0 12px 26px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset",
+                left: p.left,
+                top: p.top,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                background: p.color,
+                filter: `drop-shadow(0 0 ${p.size * 2}px ${p.color}cc)`,
+                opacity: 0.8,
               }}
-            >
-              <div className="flex items-center gap-2.5">
-                <span
-                  data-chip-dot
-                  aria-hidden
-                  className="size-1.5 shrink-0 rounded-full"
-                  style={{
-                    background: c.dot,
-                    boxShadow: `0 0 8px ${c.dot}`,
-                  }}
-                />
-                <div className="flex flex-col leading-none">
-                  <span
-                    className="text-[10px] uppercase tracking-[0.16em] text-fg-dim"
-                    style={{
-                      fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
-                    }}
-                  >
-                    {c.label}
-                  </span>
-                  <span
-                    className="mt-1 text-[12.5px] font-medium tabular-nums text-fg"
-                    style={{
-                      fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
-                    }}
-                  >
-                    {c.value}
-                  </span>
-                </div>
-              </div>
-            </div>
+            />
           ))}
 
-          {/* Sparse stars */}
+          {/* Satellite twinkling dots (smaller, foreground) */}
           <span
-            data-star
+            data-twinkle
             aria-hidden
-            className="absolute left-[20%] top-[12%] size-[3px] rounded-full bg-white"
+            className="absolute left-[42%] top-[6%] size-[3px] rounded-full bg-white"
             style={{ filter: "drop-shadow(0 0 6px rgba(255,255,255,0.9))" }}
           />
           <span
-            data-star
+            data-twinkle
             aria-hidden
-            className="absolute right-[18%] bottom-[20%] size-[2.5px] rounded-full bg-white"
-            style={{ filter: "drop-shadow(0 0 5px rgba(255,255,255,0.9))" }}
-          />
-          <span
-            data-star
-            aria-hidden
-            className="absolute left-[80%] top-[30%] size-[2px] rounded-full bg-white opacity-70"
-          />
-          <span
-            data-star
-            aria-hidden
-            className="absolute left-[12%] top-[68%] size-[2px] rounded-full bg-white opacity-70"
+            className="absolute right-[12%] top-[88%] size-1 rounded-full bg-white"
           />
         </div>
       </div>
