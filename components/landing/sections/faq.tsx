@@ -171,7 +171,7 @@ export function FAQ() {
               </h2>
 
               {/* All items rendered inline — no inner scroll */}
-              <div className="faq-list mx-auto mt-5 w-full max-w-[820px] space-y-1.5 sm:space-y-2 lg:mt-6">
+              <div className="faq-list mx-auto mt-12 w-full max-w-[820px] space-y-1.5 sm:mt-14 sm:space-y-2 lg:mt-16">
                 {faq.items.map((item, i) => {
                   const isOpen = openIdx === i;
                   return (
