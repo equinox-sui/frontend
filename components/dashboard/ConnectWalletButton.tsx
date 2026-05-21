@@ -4,13 +4,10 @@
  * Wallet/auth entry point in the dashboard top bar.
  *
  * Today it renders the in-house ConnectWalletModal (custom UI). To swap
- * in Privy's hosted modal:
- *
- *   1. `npm install @privy-io/react-auth`
- *   2. Add NEXT_PUBLIC_PRIVY_APP_ID to .env.local (see .env.example)
- *   3. Uncomment the PrivyAppProvider line in app/layout.tsx
- *   4. Re-enable the Privy branch below — see /components/landing/providers/privy-provider.tsx
- *      for the prepared provider config.
+ * in Privy's hosted modal, see PRIVY_SETUP.md at the repo root — Privy v3
+ * bundles with pnpm-style paths, so install with `pnpm install` (not
+ * `npm install`) and then uncomment the Privy branch in this file plus
+ * the PrivyAppProvider import in app/layout.tsx.
  */
 
 import { useState } from "react";

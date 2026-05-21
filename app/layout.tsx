@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif, Space_Grotesk } from "next/font/google";
 import { LenisProvider } from "@/components/landing/providers/lenis-provider";
+// import { PrivyAppProvider } from "@/components/landing/providers/privy-provider";
+// ^ Uncomment after installing Privy with pnpm (see PRIVY_SETUP.md).
 import "./globals.css";
 
 const geistSans = Geist({
