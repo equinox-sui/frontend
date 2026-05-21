@@ -10,24 +10,31 @@ export function FAQ() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const userToggledRef = useRef(false);
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
+  // Only scroll the opened item into view AFTER the user clicks one — never on mount
+  // (the GSAP pin timeline is mid-flight at mount and would scroll item #1 out of view).
   useEffect(() => {
+    if (!userToggledRef.current) return;
     if (openIdx === null) return;
     const el = itemRefs.current[openIdx];
     if (!el) return;
     const scroller = el.closest("[data-lenis-prevent]") as HTMLElement | null;
     if (!scroller) return;
-    // Wait for the answer panel to render, then scroll the question + answer into view inside the list.
     const id = window.setTimeout(() => {
       const sRect = scroller.getBoundingClientRect();
       const eRect = el.getBoundingClientRect();
-      const target =
-        scroller.scrollTop + (eRect.top - sRect.top) - 12;
-      scroller.scrollTo({ top: target, behavior: "smooth" });
+      const target = scroller.scrollTop + (eRect.top - sRect.top) - 12;
+      scroller.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
     }, 80);
     return () => window.clearTimeout(id);
   }, [openIdx]);
+
+  const handleToggle = (i: number) => {
+    userToggledRef.current = true;
+    setOpenIdx((curr) => (curr === i ? null : i));
+  };
 
   useGSAP(
     () => {
@@ -200,12 +207,12 @@ export function FAQ() {
                 className="mx-auto mt-10 flex w-full max-w-[1120px] min-h-0 flex-1 flex-col overflow-y-auto pr-1 lg:mt-12 [scrollbar-width:thin]"
                 style={{
                   maskImage:
-                    "linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 24px), transparent 100%)",
+                    "linear-gradient(to bottom, black 0, black calc(100% - 24px), transparent 100%)",
                   WebkitMaskImage:
-                    "linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 24px), transparent 100%)",
+                    "linear-gradient(to bottom, black 0, black calc(100% - 24px), transparent 100%)",
                 }}
               >
-                <div className="faq-list space-y-3 pb-6 pr-1 sm:space-y-3.5">
+                <div className="faq-list space-y-3 pb-8 pr-1 sm:space-y-3.5">
                   {faq.items.map((item, i) => {
                     const isOpen = openIdx === i;
                     return (
@@ -222,7 +229,7 @@ export function FAQ() {
                       >
                         <button
                           type="button"
-                          onClick={() => setOpenIdx(isOpen ? null : i)}
+                          onClick={() => handleToggle(i)}
                           aria-expanded={isOpen}
                           className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-4 text-left sm:px-9 sm:py-5"
                         >
