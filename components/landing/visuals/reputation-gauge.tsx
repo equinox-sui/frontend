@@ -43,8 +43,10 @@ export function ReputationGauge() {
       ctx!.clearRect(0, 0, W, H);
 
       const cx = W / 2;
-      const cy = H * 0.86;
-      const radius = Math.min(W * 0.42, H * 0.78);
+      // Center the dial vertically — cy moved up from 0.86 → 0.7 and radius
+      // tightened so the arc midpoint lands at ~H/2 instead of below it.
+      const cy = H * 0.7;
+      const radius = Math.min(W * 0.38, H * 0.55);
 
       ctx!.beginPath();
       ctx!.arc(cx, cy, radius, Math.PI, Math.PI * 2);
@@ -151,7 +153,7 @@ export function ReputationGauge() {
   return (
     <div ref={wrapRef} className="absolute inset-0" aria-hidden>
       <canvas ref={canvasRef} className="block h-full w-full" />
-      <div className="pointer-events-none absolute left-1/2 top-[18%] -translate-x-1/2">
+      <div className="pointer-events-none absolute left-1/2 top-[6%] -translate-x-1/2">
         <div className="flex items-center gap-2 rounded-full border border-border-strong bg-surface/85 px-3.5 py-1.5 backdrop-blur-md">
           <span
             className="text-base font-semibold tracking-tight text-fg tabular"

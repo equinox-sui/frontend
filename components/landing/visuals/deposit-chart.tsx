@@ -45,8 +45,10 @@ export function DepositChart() {
       ctx!.stroke();
       ctx!.setLineDash([]);
 
-      const baseline = H * 0.78;
-      const amp = H * 0.34;
+      // Vertically center the chart inside the canvas — baseline pulled up
+      // from 0.78 → 0.66 so the wave + fill block reads as centered.
+      const baseline = H * 0.66;
+      const amp = H * 0.32;
       const phase = t / 6200;
       const padX = 20;
 
