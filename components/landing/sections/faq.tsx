@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, Plus, Minus } from "lucide-react";
 import { gsap, ScrollTrigger, registerGsap } from "@/lib/gsap";
@@ -9,32 +9,7 @@ import { faq } from "@/lib/content";
 export function FAQ() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const userToggledRef = useRef(false);
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
-
-  // Only scroll the opened item into view AFTER the user clicks one — never on mount
-  // (the GSAP pin timeline is mid-flight at mount and would scroll item #1 out of view).
-  useEffect(() => {
-    if (!userToggledRef.current) return;
-    if (openIdx === null) return;
-    const el = itemRefs.current[openIdx];
-    if (!el) return;
-    const scroller = el.closest("[data-lenis-prevent]") as HTMLElement | null;
-    if (!scroller) return;
-    const id = window.setTimeout(() => {
-      const sRect = scroller.getBoundingClientRect();
-      const eRect = el.getBoundingClientRect();
-      const target = scroller.scrollTop + (eRect.top - sRect.top) - 12;
-      scroller.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
-    }, 80);
-    return () => window.clearTimeout(id);
-  }, [openIdx]);
-
-  const handleToggle = (i: number) => {
-    userToggledRef.current = true;
-    setOpenIdx((curr) => (curr === i ? null : i));
-  };
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   useGSAP(
     () => {
@@ -68,14 +43,12 @@ export function FAQ() {
           0
         );
 
-        // Mini fades early
         tl.to(
           ".faq-mini",
           { opacity: 0, scale: 0.85, ease: "power2.in", duration: 0.25 },
           0
         );
 
-        // Expanded wrapper fades in WHILE card is finishing grow
         tl.fromTo(
           ".faq-expanded",
           { opacity: 0 },
@@ -83,7 +56,6 @@ export function FAQ() {
           0.4
         );
 
-        // Headline reveals near the end of grow
         tl.fromTo(
           ".faq-headline-word",
           { opacity: 0, y: 24 },
@@ -91,7 +63,6 @@ export function FAQ() {
           0.5
         );
 
-        // Accordion items stagger in right after card is grown
         tl.fromTo(
           ".faq-item",
           { opacity: 0, y: 18 },
@@ -99,7 +70,6 @@ export function FAQ() {
           0.7
         );
 
-        // Footer reveals at very end
         tl.fromTo(
           ".faq-footer",
           { opacity: 0, y: 12 },
@@ -159,12 +129,10 @@ export function FAQ() {
         ref={pinRef}
         className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-bg lg:flex"
       >
-        {/* Dark cover behind window (hidden as window grows) */}
         <div className="absolute inset-0 bg-bg" aria-hidden />
 
-        {/* The growing white window contains BOTH mini and expanded states */}
         <div className="faq-window relative z-10 flex h-[360px] w-[330px] flex-col overflow-hidden rounded-[2rem] bg-white shadow-[0_30px_100px_-20px_rgba(0,0,0,0.6)]">
-          {/* Mini state — visible at start */}
+          {/* Mini state */}
           <div className="faq-mini absolute inset-0 p-8">
             <h3
               className="text-[2.2rem] font-medium leading-none text-[#0a0a0a]"
@@ -183,11 +151,11 @@ export function FAQ() {
             </div>
           </div>
 
-          {/* Expanded state — reveals as window grows */}
+          {/* Expanded state */}
           <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
-            <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col px-7 pt-20 sm:px-12 sm:pt-24 lg:px-20 lg:pt-28">
+            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-14 pb-6 sm:px-12 sm:pt-16 lg:px-20 lg:pt-20 lg:pb-8">
               <h2
-                className="shrink-0 text-[clamp(1.5rem,3.4vw,3.6rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#0a0a0a]"
+                className="shrink-0 text-[clamp(1.5rem,3vw,3rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#0a0a0a]"
                 style={{
                   fontFamily:
                     "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
@@ -202,106 +170,94 @@ export function FAQ() {
                 </span>
               </h2>
 
-              <div
-                data-lenis-prevent
-                className="mx-auto mt-10 flex w-full max-w-[1120px] min-h-0 flex-1 flex-col overflow-y-auto pr-1 lg:mt-12 [scrollbar-width:thin]"
-                style={{
-                  maskImage:
-                    "linear-gradient(to bottom, black 0, black calc(100% - 24px), transparent 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(to bottom, black 0, black calc(100% - 24px), transparent 100%)",
-                }}
-              >
-                <div className="faq-list space-y-3 pb-8 pr-1 sm:space-y-3.5">
-                  {faq.items.map((item, i) => {
-                    const isOpen = openIdx === i;
-                    return (
-                      <div
-                        key={item.q}
-                        ref={(el) => {
-                          itemRefs.current[i] = el;
-                        }}
-                        className={`faq-item transition-colors ${
-                          isOpen
-                            ? "rounded-[36px] bg-[#0a0a0a]/[0.05]"
-                            : "rounded-full bg-[#0a0a0a]/[0.04] hover:bg-[#0a0a0a]/[0.06]"
-                        }`}
+              {/* All items rendered inline — no inner scroll */}
+              <div className="faq-list mx-auto mt-6 w-full max-w-[1120px] space-y-2 sm:space-y-2.5 lg:mt-8">
+                {faq.items.map((item, i) => {
+                  const isOpen = openIdx === i;
+                  return (
+                    <div
+                      key={item.q}
+                      className={`faq-item transition-colors ${
+                        isOpen
+                          ? "rounded-[28px] bg-[#0a0a0a]/[0.05]"
+                          : "rounded-full bg-[#0a0a0a]/[0.04] hover:bg-[#0a0a0a]/[0.06]"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenIdx((curr) => (curr === i ? null : i))
+                        }
+                        aria-expanded={isOpen}
+                        className="flex w-full items-center justify-between gap-5 rounded-full px-6 py-3 text-left sm:px-8 sm:py-3.5"
                       >
-                        <button
-                          type="button"
-                          onClick={() => handleToggle(i)}
-                          aria-expanded={isOpen}
-                          className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-4 text-left sm:px-9 sm:py-5"
+                        <span
+                          className="text-[15px] font-medium leading-snug text-[#0a0a0a] sm:text-base lg:text-[17px]"
+                          style={{
+                            fontFamily:
+                              "var(--font-tech), ui-sans-serif, system-ui",
+                          }}
                         >
-                          <span
-                            className="text-base font-medium leading-snug text-[#0a0a0a] sm:text-lg lg:text-xl"
-                            style={{
-                              fontFamily:
-                                "var(--font-tech), ui-sans-serif, system-ui",
-                            }}
-                          >
-                            {i + 1}. {item.q}
-                          </span>
-                          <span
-                            aria-hidden
-                            className="grid size-11 shrink-0 place-items-center rounded-full text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] sm:size-12"
-                            style={{ background: "var(--gradient-brand)" }}
-                          >
-                            {isOpen ? (
-                              <Minus className="size-4" />
-                            ) : (
-                              <Plus className="size-4" />
-                            )}
-                          </span>
-                        </button>
-                        {isOpen && (
-                          <div
-                            className="px-7 pb-5 pt-1 text-sm leading-relaxed text-[#0a0a0a]/70 sm:px-9 sm:pb-6 sm:text-[15px] lg:text-base"
-                            style={{
-                              fontFamily:
-                                "var(--font-tech), ui-sans-serif, system-ui",
-                            }}
-                          >
-                            {item.a}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
+                          {i + 1}. {item.q}
+                        </span>
+                        <span
+                          aria-hidden
+                          className="grid size-10 shrink-0 place-items-center rounded-full text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] sm:size-11"
+                          style={{ background: "var(--gradient-brand)" }}
+                        >
+                          {isOpen ? (
+                            <Minus className="size-4" />
+                          ) : (
+                            <Plus className="size-4" />
+                          )}
+                        </span>
+                      </button>
+                      {isOpen && (
+                        <div
+                          className="px-6 pb-4 pt-1 text-sm leading-relaxed text-[#0a0a0a]/70 sm:px-8 sm:pb-5 lg:text-[15px]"
+                          style={{
+                            fontFamily:
+                              "var(--font-tech), ui-sans-serif, system-ui",
+                          }}
+                        >
+                          {item.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Footer — spans the WIDER outer container (not constrained to accordion's max-w) */}
-              <div className="faq-footer mt-6 flex shrink-0 flex-col items-start justify-between gap-5 pb-6 sm:flex-row sm:items-center lg:mt-8 lg:pb-8">
+              {/* Footer */}
+              <div className="faq-footer mt-6 flex shrink-0 flex-col items-start justify-between gap-5 sm:flex-row sm:items-center lg:mt-8">
                 <div
-                  className="flex max-w-xl items-start gap-3 text-[15px] leading-snug text-[#0a0a0a]/55 sm:text-base lg:text-[17px]"
+                  className="flex max-w-xl items-start gap-3 text-[13px] leading-snug text-[#0a0a0a]/55 sm:text-[14px] lg:text-[15px]"
                   style={{
                     fontFamily:
                       "var(--font-tech), ui-sans-serif, system-ui",
                   }}
                 >
-                  <Plus className="mt-1 size-5 shrink-0" />
+                  <Plus className="mt-0.5 size-4 shrink-0" />
                   <span>{faq.hint}</span>
                 </div>
                 <a
                   href={faq.community.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex shrink-0 items-center gap-4 text-[#0a0a0a]"
+                  className="group flex shrink-0 items-center gap-3 text-[#0a0a0a]"
                 >
                   <span
                     aria-hidden
-                    className="grid size-[68px] place-items-center rounded-[20px] bg-[#3b5bff] text-white transition-transform group-hover:-translate-y-0.5"
+                    className="grid size-[56px] place-items-center rounded-[16px] bg-[#3b5bff] text-white transition-transform group-hover:-translate-y-0.5"
                   >
-                    <span className="inline-flex gap-2">
-                      <span className="size-2 rounded-full bg-white" />
-                      <span className="size-2 rounded-full bg-white" />
-                      <span className="size-2 rounded-full bg-white" />
+                    <span className="inline-flex gap-1.5">
+                      <span className="size-1.5 rounded-full bg-white" />
+                      <span className="size-1.5 rounded-full bg-white" />
+                      <span className="size-1.5 rounded-full bg-white" />
                     </span>
                   </span>
                   <span
-                    className="text-[15px] font-semibold leading-tight sm:text-base lg:text-[17px]"
+                    className="text-[13px] font-semibold leading-tight sm:text-[14px] lg:text-[15px]"
                     style={{
                       fontFamily:
                         "var(--font-tech), ui-sans-serif, system-ui",
