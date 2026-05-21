@@ -153,7 +153,7 @@ export function FAQ() {
 
           {/* Expanded state */}
           <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
-            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-24 pb-6 sm:px-12 sm:pt-28 lg:px-20 lg:pt-36 lg:pb-8">
+            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-20 pb-5 sm:px-12 sm:pt-24 lg:px-20 lg:pt-28 lg:pb-6">
               <h2
                 className="shrink-0 text-center text-[clamp(2rem,4.2vw,4.25rem)] font-normal leading-[1.05] tracking-[-0.015em] text-[#0a0a0a]"
                 style={{
@@ -171,7 +171,7 @@ export function FAQ() {
               </h2>
 
               {/* All items rendered inline — no inner scroll */}
-              <div className="faq-list mx-auto mt-8 w-full max-w-[820px] space-y-2.5 sm:space-y-3 lg:mt-10">
+              <div className="faq-list mx-auto mt-6 w-full max-w-[820px] space-y-2 sm:space-y-2.5 lg:mt-8">
                 {faq.items.map((item, i) => {
                   const isOpen = openIdx === i;
                   return (
@@ -189,7 +189,7 @@ export function FAQ() {
                           setOpenIdx((curr) => (curr === i ? null : i))
                         }
                         aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-4 text-left sm:px-9 sm:py-4"
+                        className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-3 text-left sm:px-9 sm:py-3.5"
                       >
                         <span
                           className="text-[15px] font-normal leading-snug text-[#0a0a0a] sm:text-[17px] lg:text-[18px]"
@@ -228,8 +228,8 @@ export function FAQ() {
                 })}
               </div>
 
-              {/* Footer */}
-              <div className="faq-footer mt-6 flex shrink-0 flex-col items-start justify-between gap-5 sm:flex-row sm:items-center lg:mt-8">
+              {/* Footer — anchored to the bottom of the window so it never clips */}
+              <div className="faq-footer mt-auto flex shrink-0 flex-col items-start justify-between gap-4 pt-6 sm:flex-row sm:items-center sm:gap-5">
                 <div
                   className="flex max-w-xl items-start gap-3 text-[13px] leading-snug text-[#0a0a0a]/55 sm:text-[14px] lg:text-[15px]"
                   style={{
@@ -248,7 +248,7 @@ export function FAQ() {
                 >
                   <span
                     aria-hidden
-                    className="grid size-[56px] place-items-center rounded-[16px] bg-[#3b5bff] text-white transition-transform group-hover:-translate-y-0.5"
+                    className="grid size-[48px] place-items-center rounded-[14px] bg-[#3b5bff] text-white transition-transform group-hover:-translate-y-0.5"
                   >
                     <span className="inline-flex gap-1.5">
                       <span className="size-1.5 rounded-full bg-white" />
@@ -257,7 +257,7 @@ export function FAQ() {
                     </span>
                   </span>
                   <span
-                    className="text-[13px] font-semibold leading-tight sm:text-[14px] lg:text-[15px]"
+                    className="text-[13px] font-semibold leading-tight sm:text-[14px]"
                     style={{
                       fontFamily:
                         "var(--font-tech), ui-sans-serif, system-ui",
