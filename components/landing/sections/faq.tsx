@@ -169,7 +169,7 @@ export function FAQ() {
             <h3
               className="text-[2.2rem] font-medium leading-none text-[#0a0a0a]"
               style={{
-                fontFamily: "var(--font-geist-sans), ui-sans-serif, system-ui",
+                fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
               }}
             >
               FAQ
@@ -190,7 +190,7 @@ export function FAQ() {
                 className="shrink-0 text-[clamp(1.5rem,3.4vw,3.6rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#0a0a0a]"
                 style={{
                   fontFamily:
-                    "var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system",
+                    "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
                 }}
               >
                 <span className="inline-flex flex-nowrap items-baseline gap-x-3 sm:gap-x-5 lg:gap-x-7 whitespace-nowrap">

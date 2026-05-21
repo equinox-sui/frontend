@@ -29,11 +29,11 @@
   --color-amber: #ffc46b;
   --color-rose: #ff7a90;
 
-  /* Unified body/tech face — pinned to Geist Sans so headings + body match.
-     (Space Grotesk variable is still loaded by layout.tsx and remains
-     available as --font-space-grotesk for one-off use, but nothing in the
-     landing references it directly anymore.) */
-  --font-tech: var(--font-geist-sans);
+  /* Unified display + body face for the landing. Space Grotesk has the
+     humanist curves (y-descender, single-story g, distinctive &) that the
+     reference design uses, and we pin every landing surface to this one
+     variable so headings + copy never mismatch. */
+  --font-tech: var(--font-space-grotesk);
 
   --radius-pill: 57px;
   --radius-card: 1.5rem;
@@ -79,9 +79,9 @@
   --color-warning: #f0c34a;
   --color-danger: #ff6b6b;
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-instrument-serif);
+  --font-display: var(--font-space-grotesk);
 }
 
 :root {

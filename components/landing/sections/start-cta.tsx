@@ -57,7 +57,7 @@ export function StartCTA() {
               className="text-[clamp(1.5rem,2.4vw,2.25rem)] font-medium leading-tight text-fg"
               style={{
                 fontFamily:
-                  "var(--font-geist-sans), ui-sans-serif, system-ui",
+                  "var(--font-tech), ui-sans-serif, system-ui",
               }}
             >
               Start your self-repaying loan

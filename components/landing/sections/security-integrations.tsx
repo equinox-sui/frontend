@@ -126,7 +126,7 @@ export function SecurityIntegrations() {
           <h2
             className="text-[clamp(2.4rem,5.4vw,4.6rem)] font-medium leading-[1.02] tracking-[-0.02em] text-fg"
             style={{
-              fontFamily: "var(--font-geist-sans), ui-sans-serif, system-ui",
+              fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
             }}
           >
             <span className="si-title-line block overflow-hidden">
@@ -232,7 +232,7 @@ export function SecurityIntegrations() {
           <p
             className="si-partners-label text-[clamp(1.4rem,2.6vw,2rem)] font-medium tracking-[-0.01em] text-fg"
             style={{
-              fontFamily: "var(--font-geist-sans), ui-sans-serif, system-ui",
+              fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
             }}
           >
             Partners

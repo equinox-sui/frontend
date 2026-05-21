@@ -107,7 +107,7 @@ export function HowAuralis() {
             className="how-title relative z-10 text-center text-[clamp(2rem,6.4vw,5.25rem)] font-medium leading-[1.05] tracking-[-0.02em] text-fg lg:absolute lg:inset-x-0 lg:top-1/2 lg:-translate-y-1/2"
             style={{
               fontFamily:
-                "var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system",
+                "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
             }}
           >
             {howAuralis.title}

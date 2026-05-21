@@ -143,7 +143,7 @@ export function WhatYouCanDo() {
           className="text-center text-[clamp(2rem,5.4vw,4.4rem)] font-medium leading-[1.05] tracking-[-0.02em] text-fg"
           style={{
             fontFamily:
-              "var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system",
+              "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
           }}
         >
           {whatYouCanDo.title.split(" ").map((word, wi) => (

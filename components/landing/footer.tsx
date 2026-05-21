@@ -39,7 +39,7 @@ export function Footer() {
                 className="text-sm font-semibold tracking-wide text-fg"
                 style={{
                   fontFamily:
-                    "var(--font-geist-sans), ui-sans-serif, system-ui",
+                    "var(--font-tech), ui-sans-serif, system-ui",
                 }}
               >
                 EQUINOX AGENT
@@ -103,7 +103,7 @@ export function Footer() {
             className="group flex h-[150px] w-full items-center justify-center rounded-[24px] border border-border bg-white/[0.02] text-fg transition-colors hover:bg-white/[0.05] lg:w-[260px]"
             style={{
               fontFamily:
-                "var(--font-geist-sans), ui-sans-serif, system-ui",
+                "var(--font-tech), ui-sans-serif, system-ui",
             }}
           >
             <span className="flex items-center gap-3 text-lg font-medium">
@@ -122,7 +122,7 @@ export function Footer() {
             className="block bg-gradient-to-b from-white/[0.06] to-white/[0.01] bg-clip-text text-transparent"
             style={{
               fontFamily:
-                "var(--font-geist-sans), ui-sans-serif, system-ui",
+                "var(--font-tech), ui-sans-serif, system-ui",
               fontSize: "clamp(4rem, 16vw, 14rem)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
