@@ -153,7 +153,7 @@ export function FAQ() {
 
           {/* Expanded state */}
           <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
-            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-14 pb-6 sm:px-12 sm:pt-16 lg:px-20 lg:pt-20 lg:pb-8">
+            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-24 pb-6 sm:px-12 sm:pt-28 lg:px-20 lg:pt-36 lg:pb-8">
               <h2
                 className="shrink-0 text-[clamp(1.5rem,3vw,3rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#0a0a0a]"
                 style={{
