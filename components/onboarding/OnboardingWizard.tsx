@@ -15,19 +15,15 @@ import {
   Coins,
 } from "lucide-react";
 import { Stepper } from "./Stepper";
-import { Button } from "@/components/ui/Button";
 import { riskProfiles, mockUser, SUI_PRICE } from "@/data/mock";
 import { formatUSD, formatSUI } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
-const STEPS = [
-  "Asset",
-  "Amount",
-  "Mode",
-  "Payoff",
-  "Risk",
-  "Review",
-];
+const STEPS = ["Asset", "Amount", "Mode", "Payoff", "Risk", "Review"];
+
+const TECH_FONT: React.CSSProperties = {
+  fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
+};
 
 const ASSETS = [
   {
@@ -110,6 +106,15 @@ interface State {
   risk: "conservative" | "balanced" | "aggressive";
 }
 
+const BRAND_GRAD = "var(--gradient-brand)";
+
+const SELECTED_CARD_STYLE: React.CSSProperties = {
+  background:
+    "linear-gradient(180deg, rgba(145,129,245,0.10) 0%, rgba(67,97,252,0.06) 100%)",
+  boxShadow:
+    "0 0 0 1px rgba(145,129,245,0.55), 0 24px 50px -22px rgba(67,97,252,0.45)",
+};
+
 export function OnboardingWizard() {
   const [step, setStep] = useState(0);
   const [state, setState] = useState<State>({
@@ -129,7 +134,7 @@ export function OnboardingWizard() {
     gsap.fromTo(
       el,
       { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 0.55, ease: "expo.out" },
+      { opacity: 1, y: 0, duration: 0.55, ease: "expo.out" }
     );
   }, [step]);
 
@@ -138,7 +143,7 @@ export function OnboardingWizard() {
 
   const profile = useMemo(
     () => riskProfiles.find((p) => p.id === state.risk)!,
-    [state.risk],
+    [state.risk]
   );
   const usdValue = state.amount * SUI_PRICE;
   const borrowed = usdValue * profile.ltv;
@@ -146,22 +151,29 @@ export function OnboardingWizard() {
   const toAgent = borrowed * 0.4;
 
   return (
-    <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-10 py-10">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-10 py-10">
       <header className="flex flex-col gap-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/"
-            className="text-[12px] text-ink-400 hover:text-ink-100"
+            className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.18em] text-fg-dim transition-colors hover:text-fg"
+            style={TECH_FONT}
           >
-            ← Back to home
+            <ArrowLeft className="size-3.5" /> Back to home
           </Link>
           <Stepper steps={STEPS} current={step} />
         </div>
         <div>
-          <div className="text-[11px] uppercase tracking-[0.18em] text-ink-400">
+          <div
+            className="text-[11px] uppercase tracking-[0.18em] text-fg-dim"
+            style={TECH_FONT}
+          >
             Open a position
           </div>
-          <h1 className="mt-2 text-[34px] font-medium leading-[1.05] tracking-[-0.02em] text-ink-50 sm:text-[42px]">
+          <h1
+            className="mt-3 text-[clamp(2rem,4.4vw,3.4rem)] font-medium leading-[1.05] tracking-[-0.02em] text-fg"
+            style={TECH_FONT}
+          >
             {step === 0 && "Pick what you'll lock."}
             {step === 1 && "Decide how much."}
             {step === 2 && "Choose how the spread is used."}
@@ -174,7 +186,7 @@ export function OnboardingWizard() {
 
       <div ref={panelRef} className="relative">
         {step === 0 && (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {ASSETS.map((a) => {
               const active = state.asset === a.id;
               return (
@@ -185,35 +197,53 @@ export function OnboardingWizard() {
                     a.enabled && setState((s) => ({ ...s, asset: a.id }))
                   }
                   className={cn(
-                    "group relative overflow-hidden rounded-2xl border p-5 text-left transition-all",
+                    "group relative overflow-hidden rounded-[1.5rem] border p-6 text-left transition-all",
                     a.enabled
                       ? "cursor-pointer"
                       : "cursor-not-allowed opacity-50",
                     active
-                      ? "border-[var(--color-accent)]/50 bg-[var(--color-accent)]/8"
-                      : "border-white/[0.06] bg-white/[0.02] hover:border-white/15",
+                      ? "border-transparent"
+                      : "border-border-strong bg-surface/40 backdrop-blur-md hover:border-violet/40 hover:bg-surface/60"
                   )}
+                  style={active ? SELECTED_CARD_STYLE : undefined}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.04] font-mono text-[12px] text-ink-200">
+                    <span
+                      className="grid h-11 w-11 place-items-center rounded-xl border border-border-strong bg-surface-2/60 font-mono text-[11px] text-fg-muted"
+                      style={TECH_FONT}
+                    >
                       {a.name.slice(0, 3)}
                     </span>
                     {a.enabled ? (
-                      <span className="text-[11px] uppercase tracking-[0.14em] text-ink-300">
+                      <span
+                        className="text-[11px] uppercase tracking-[0.16em] text-fg-muted"
+                        style={TECH_FONT}
+                      >
                         Balance · {formatSUI(a.balance, 2)}
                       </span>
                     ) : (
-                      <span className="rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em] text-ink-400">
+                      <span
+                        className="rounded-full border border-border bg-surface-2/40 px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em] text-fg-dim"
+                        style={TECH_FONT}
+                      >
                         {a.network}
                       </span>
                     )}
                   </div>
-                  <h3 className="mt-7 text-[20px] font-medium tracking-tight text-ink-50">
+                  <h3
+                    className="mt-8 text-[24px] font-medium tracking-tight text-fg"
+                    style={TECH_FONT}
+                  >
                     {a.name}
                   </h3>
-                  <p className="text-[12.5px] text-ink-400">{a.label}</p>
+                  <p className="text-[13px] text-fg-muted" style={TECH_FONT}>
+                    {a.label}
+                  </p>
                   {active && (
-                    <div className="absolute right-4 top-4 grid h-5 w-5 place-items-center rounded-full bg-[var(--color-accent)] text-ink-950">
+                    <div
+                      className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full text-white"
+                      style={{ background: BRAND_GRAD }}
+                    >
                       <Check size={12} />
                     </div>
                   )}
@@ -224,67 +254,80 @@ export function OnboardingWizard() {
         )}
 
         {step === 1 && (
-          <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-            <div className="space-y-5">
-              <div className="rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6">
-                <div className="flex items-center justify-between text-[11.5px] uppercase tracking-[0.14em] text-ink-400">
-                  <span>Amount in SUI</span>
-                  <span className="font-mono text-ink-200 tab-nums">
-                    Max {formatSUI(mockUser.suiBalance, 2)}
-                  </span>
-                </div>
-                <div className="mt-3 flex items-baseline gap-2">
-                  <input
-                    type="number"
-                    value={state.amount}
-                    min={10}
-                    max={mockUser.suiBalance}
-                    onChange={(e) =>
-                      setState((s) => ({
-                        ...s,
-                        amount: Number(e.target.value) || 0,
-                      }))
-                    }
-                    className="w-full bg-transparent text-[44px] font-medium tracking-[-0.02em] text-ink-50 outline-none tab-nums"
-                  />
-                  <span className="text-[18px] text-ink-400">SUI</span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setState((s) => ({ ...s, amount: mockUser.suiBalance }))
-                    }
-                    className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2.5 py-1 text-[11px] uppercase tracking-[0.14em] text-ink-200 hover:bg-white/[0.05]"
-                  >
-                    Max
-                  </button>
-                </div>
+          <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
+            <div className="rounded-[1.5rem] border border-border-strong bg-surface/45 p-7 backdrop-blur-md">
+              <div
+                className="flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-fg-dim"
+                style={TECH_FONT}
+              >
+                <span>Amount in SUI</span>
+                <span className="font-mono tabular-nums text-fg-muted">
+                  Max {formatSUI(mockUser.suiBalance, 2)}
+                </span>
+              </div>
+              <div className="mt-4 flex items-baseline gap-3">
                 <input
-                  type="range"
+                  type="number"
+                  value={state.amount}
                   min={10}
                   max={mockUser.suiBalance}
-                  step={5}
-                  value={state.amount}
                   onChange={(e) =>
                     setState((s) => ({
                       ...s,
-                      amount: Number(e.target.value),
+                      amount: Number(e.target.value) || 0,
                     }))
                   }
-                  className="mt-5 w-full accent-[var(--color-accent)]"
+                  className="w-full bg-transparent text-[48px] font-medium tracking-[-0.02em] tabular-nums text-fg outline-none"
+                  style={TECH_FONT}
                 />
-                <div className="mt-4 flex items-center justify-between text-[12px] text-ink-400">
-                  <span>≈ {formatUSD(usdValue)}</span>
-                  <span>Min · 10 SUI</span>
-                </div>
+                <span className="text-[18px] text-fg-dim" style={TECH_FONT}>
+                  SUI
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setState((s) => ({ ...s, amount: mockUser.suiBalance }))
+                  }
+                  className="rounded-full border border-border-strong bg-surface-2/50 px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-fg-muted transition-colors hover:border-violet/40 hover:text-fg"
+                  style={TECH_FONT}
+                >
+                  Max
+                </button>
+              </div>
+              <input
+                type="range"
+                min={10}
+                max={mockUser.suiBalance}
+                step={5}
+                value={state.amount}
+                onChange={(e) =>
+                  setState((s) => ({ ...s, amount: Number(e.target.value) }))
+                }
+                className="mt-6 w-full accent-violet"
+                style={{ accentColor: "#9181f5" }}
+              />
+              <div
+                className="mt-4 flex items-center justify-between text-[12px] text-fg-dim"
+                style={TECH_FONT}
+              >
+                <span>≈ {formatUSD(usdValue)}</span>
+                <span>Min · 10 SUI</span>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6">
-              <div className="text-[11px] uppercase tracking-[0.16em] text-ink-400">
+            <div className="rounded-[1.5rem] border border-border-strong bg-surface/45 p-7 backdrop-blur-md">
+              <div
+                className="text-[11px] uppercase tracking-[0.16em] text-fg-dim"
+                style={TECH_FONT}
+              >
                 Projected at activation
               </div>
               <Mini k="Collateral value" v={formatUSD(usdValue)} />
-              <Mini k="Borrow capacity" v={formatUSD(borrowed)} hint={`${Math.round(profile.ltv * 100)}% LTV`} />
+              <Mini
+                k="Borrow capacity"
+                v={formatUSD(borrowed)}
+                hint={`${Math.round(profile.ltv * 100)}% LTV`}
+              />
               <Mini k="You receive" v={formatUSD(toUser)} accent />
               <Mini k="Agent recycles" v={formatUSD(toAgent)} />
             </div>
@@ -292,7 +335,7 @@ export function OnboardingWizard() {
         )}
 
         {step === 2 && (
-          <div className="grid gap-3 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-3">
             {MODES.map((m) => {
               const active = state.mode === m.id;
               const Icon = m.icon;
@@ -304,39 +347,65 @@ export function OnboardingWizard() {
                     m.enabled && setState((s) => ({ ...s, mode: m.id }))
                   }
                   className={cn(
-                    "relative overflow-hidden rounded-3xl border p-6 text-left transition-all",
-                    m.enabled ? "cursor-pointer" : "cursor-not-allowed opacity-45",
+                    "relative overflow-hidden rounded-[1.5rem] border p-6 text-left transition-all",
+                    m.enabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed opacity-45",
                     active
-                      ? "border-[var(--color-accent)]/50 bg-[var(--color-accent)]/8"
-                      : "border-white/[0.06] bg-white/[0.02] hover:border-white/15",
+                      ? "border-transparent"
+                      : "border-border-strong bg-surface/40 backdrop-blur-md hover:border-violet/40 hover:bg-surface/60"
                   )}
+                  style={active ? SELECTED_CARD_STYLE : undefined}
                 >
                   <div className="flex items-center justify-between">
                     <span
                       className={cn(
-                        "grid h-9 w-9 place-items-center rounded-xl border",
+                        "grid h-10 w-10 place-items-center rounded-xl border text-fg-muted",
                         active
-                          ? "border-[var(--color-accent)]/50 bg-[var(--color-accent)]/15 text-[var(--color-accent)]"
-                          : "border-white/10 bg-white/[0.03] text-ink-200",
+                          ? "border-violet/50 text-white"
+                          : "border-border-strong bg-surface-2/50"
                       )}
+                      style={
+                        active
+                          ? {
+                              background:
+                                "linear-gradient(135deg, rgba(145,129,245,0.45), rgba(67,97,252,0.35))",
+                            }
+                          : undefined
+                      }
                     >
-                      <Icon size={15} />
+                      <Icon size={16} />
                     </span>
                     {m.recommended && (
-                      <span className="rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em] text-[var(--color-accent)]">
+                      <span
+                        className="rounded-full px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em] text-white"
+                        style={{
+                          background: BRAND_GRAD,
+                          ...TECH_FONT,
+                        }}
+                      >
                         Recommended
                       </span>
                     )}
                     {!m.enabled && (
-                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em] text-ink-400">
+                      <span
+                        className="rounded-full border border-border bg-surface-2/40 px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em] text-fg-dim"
+                        style={TECH_FONT}
+                      >
                         Coming soon
                       </span>
                     )}
                   </div>
-                  <h3 className="mt-8 text-[18px] font-medium tracking-[-0.01em] text-ink-50">
+                  <h3
+                    className="mt-9 text-[19px] font-medium tracking-[-0.01em] text-fg"
+                    style={TECH_FONT}
+                  >
                     {m.name}
                   </h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-ink-300">
+                  <p
+                    className="mt-2 text-[13.5px] leading-relaxed text-fg-muted"
+                    style={TECH_FONT}
+                  >
                     {m.blurb}
                   </p>
                 </button>
@@ -346,13 +415,16 @@ export function OnboardingWizard() {
         )}
 
         {step === 3 && (
-          <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-            <div className="rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6">
-              <div className="flex items-center gap-2 text-[11.5px] uppercase tracking-[0.16em] text-ink-400">
+          <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+            <div className="rounded-[1.5rem] border border-border-strong bg-surface/45 p-7 backdrop-blur-md">
+              <div
+                className="flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-fg-dim"
+                style={TECH_FONT}
+              >
                 <CalendarDays size={14} />
                 Target payoff window
               </div>
-              <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {PAYOFFS.map((p) => {
                   const active = state.payoff === p.months;
                   return (
@@ -362,31 +434,50 @@ export function OnboardingWizard() {
                         setState((s) => ({ ...s, payoff: p.months }))
                       }
                       className={cn(
-                        "rounded-2xl border px-3 py-4 text-center text-[13px] transition-colors",
+                        "rounded-2xl border px-3 py-5 text-center transition-colors",
                         active
-                          ? "border-[var(--color-accent)]/50 bg-[var(--color-accent)]/10 text-ink-50"
-                          : "border-white/[0.06] bg-white/[0.02] text-ink-200 hover:border-white/15",
+                          ? "border-transparent text-fg"
+                          : "border-border-strong bg-surface-2/40 text-fg-muted hover:border-violet/40 hover:text-fg"
                       )}
+                      style={active ? SELECTED_CARD_STYLE : undefined}
                     >
-                      <div className="font-mono text-[22px] tab-nums text-ink-50">
+                      <div
+                        className="font-mono text-[24px] tabular-nums text-fg"
+                        style={TECH_FONT}
+                      >
                         {p.months}
                       </div>
-                      <div className="text-[11.5px] text-ink-400">months</div>
+                      <div
+                        className="text-[11px] uppercase tracking-[0.14em] text-fg-dim"
+                        style={TECH_FONT}
+                      >
+                        months
+                      </div>
                     </button>
                   );
                 })}
               </div>
-              <p className="mt-6 text-[12.5px] text-ink-400">
-                Target date · <span className="text-ink-100">{formatDate(state.payoff)}</span>.
-                The agent will rebalance more aggressively if you fall behind schedule.
+              <p
+                className="mt-6 text-[13px] text-fg-muted"
+                style={TECH_FONT}
+              >
+                Target date ·{" "}
+                <span className="text-fg">{formatDate(state.payoff)}</span>.
+                The agent rebalances more aggressively if you fall behind schedule.
               </p>
             </div>
 
-            <div className="rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6">
-              <div className="text-[11px] uppercase tracking-[0.16em] text-ink-400">
+            <div className="rounded-[1.5rem] border border-border-strong bg-surface/45 p-7 backdrop-blur-md">
+              <div
+                className="text-[11px] uppercase tracking-[0.16em] text-fg-dim"
+                style={TECH_FONT}
+              >
                 Why a window?
               </div>
-              <p className="mt-3 text-[13px] leading-relaxed text-ink-200">
+              <p
+                className="mt-4 text-[13.5px] leading-relaxed text-fg-muted"
+                style={TECH_FONT}
+              >
                 Telling the agent your horizon lets it pick the right balance
                 between safety and yield. Shorter = more aggressive rebalance,
                 longer = lower variance.
@@ -396,7 +487,7 @@ export function OnboardingWizard() {
         )}
 
         {step === 4 && (
-          <div className="grid gap-3 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-3">
             {riskProfiles.map((p) => {
               const active = state.risk === p.id;
               const Icon = RISK_ICONS[p.id];
@@ -405,35 +496,52 @@ export function OnboardingWizard() {
                   key={p.id}
                   onClick={() => setState((s) => ({ ...s, risk: p.id }))}
                   className={cn(
-                    "relative overflow-hidden rounded-3xl border p-6 text-left transition-all",
+                    "relative overflow-hidden rounded-[1.5rem] border p-6 text-left transition-all",
                     active
-                      ? "border-[var(--color-accent)]/50 bg-[var(--color-accent)]/8"
-                      : "border-white/[0.06] bg-white/[0.02] hover:border-white/15",
+                      ? "border-transparent"
+                      : "border-border-strong bg-surface/40 backdrop-blur-md hover:border-violet/40 hover:bg-surface/60"
                   )}
+                  style={active ? SELECTED_CARD_STYLE : undefined}
                 >
                   <div className="flex items-center justify-between">
                     <span
                       className={cn(
-                        "grid h-9 w-9 place-items-center rounded-xl border",
+                        "grid h-10 w-10 place-items-center rounded-xl border text-fg-muted",
                         active
-                          ? "border-[var(--color-accent)]/50 bg-[var(--color-accent)]/15 text-[var(--color-accent)]"
-                          : "border-white/10 bg-white/[0.03] text-ink-200",
+                          ? "border-violet/50 text-white"
+                          : "border-border-strong bg-surface-2/50"
                       )}
+                      style={
+                        active
+                          ? {
+                              background:
+                                "linear-gradient(135deg, rgba(145,129,245,0.45), rgba(67,97,252,0.35))",
+                            }
+                          : undefined
+                      }
                     >
-                      <Icon size={15} />
+                      <Icon size={16} />
                     </span>
-                    <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-ink-500">
+                    <span
+                      className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-fg-dim"
+                      style={TECH_FONT}
+                    >
                       {p.glyph}
                     </span>
                   </div>
-                  <h3 className="mt-7 text-[20px] font-medium tracking-[-0.01em] text-ink-50">
+                  <h3
+                    className="mt-7 text-[22px] font-medium tracking-[-0.01em] text-fg"
+                    style={TECH_FONT}
+                  >
                     {p.label}
                   </h3>
-                  <p className="mt-2 text-[12.5px] leading-relaxed text-ink-300">
+                  <p
+                    className="mt-2 text-[13px] leading-relaxed text-fg-muted"
+                    style={TECH_FONT}
+                  >
                     {p.blurb}
                   </p>
-
-                  <dl className="mt-6 space-y-2.5 border-t border-white/[0.05] pt-4 text-[12.5px]">
+                  <dl className="mt-6 space-y-2.5 border-t border-border pt-4 text-[12.5px]">
                     <Stat k="LTV" v={`${Math.round(p.ltv * 100)}%`} />
                     <Stat
                       k="Est. APY"
@@ -456,17 +564,31 @@ export function OnboardingWizard() {
         )}
 
         {step === 5 && (
-          <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-            <div className="rounded-3xl border border-white/[0.06] bg-gradient-to-b from-white/[0.03] to-transparent p-7">
-              <div className="text-[11px] uppercase tracking-[0.16em] text-ink-400">
+          <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-border-strong bg-surface/45 p-7 backdrop-blur-md">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-24 right-0 h-56 w-56 rounded-full opacity-50 blur-3xl"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(145,129,245,0.45), transparent 70%)",
+                }}
+              />
+              <div
+                className="relative text-[11px] uppercase tracking-[0.16em] text-fg-dim"
+                style={TECH_FONT}
+              >
                 You&apos;re about to
               </div>
-              <h2 className="mt-3 text-[26px] font-medium tracking-[-0.015em] text-ink-50">
-                Deposit {state.amount.toLocaleString()} SUI ·{" "}
-                <span className="text-ink-400">{formatUSD(usdValue)}</span>
+              <h2
+                className="relative mt-3 text-[28px] font-medium tracking-[-0.015em] text-fg"
+                style={TECH_FONT}
+              >
+                Deposit {state.amount.toLocaleString()} SUI{" "}
+                <span className="text-fg-dim">· {formatUSD(usdValue)}</span>
               </h2>
 
-              <ul className="mt-7 space-y-3 text-[13.5px]">
+              <ul className="relative mt-7 space-y-3 text-[13.5px]">
                 <Confirm
                   icon={<Coins size={14} />}
                   k="Borrow"
@@ -500,45 +622,57 @@ export function OnboardingWizard() {
                 />
               </ul>
 
-              <div className="mt-7 flex flex-col gap-3 border-t border-white/[0.06] pt-6 sm:flex-row">
-                <Button
-                  variant="outline"
-                  onClick={prev}
-                  className="flex-1"
-                >
+              <div className="relative mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row">
+                <SecondaryButton onClick={prev} className="flex-1">
                   Back
-                </Button>
-                <Button className="flex-[1.4]" size="lg">
-                  Confirm & activate
-                  <ArrowRight size={16} />
-                </Button>
+                </SecondaryButton>
+                <PrimaryButton className="flex-[1.4]">
+                  <span>Confirm &amp; activate</span>
+                  <ArrowRight className="size-4" />
+                </PrimaryButton>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6">
-                <div className="text-[11px] uppercase tracking-[0.16em] text-ink-400">
+              <div className="rounded-[1.5rem] border border-border-strong bg-surface/45 p-6 backdrop-blur-md">
+                <div
+                  className="text-[11px] uppercase tracking-[0.16em] text-fg-dim"
+                  style={TECH_FONT}
+                >
                   Manifesto
                 </div>
-                <p className="mt-3 text-[13px] leading-relaxed text-ink-200">
+                <p
+                  className="mt-3 text-[13.5px] leading-relaxed text-fg-muted"
+                  style={TECH_FONT}
+                >
                   This activation creates an immutable rule set on Walrus. Your
                   agent can never deviate from it.
                 </p>
                 <Link
                   href="/manifesto"
-                  className="mt-4 inline-flex items-center gap-2 text-[12.5px] text-[var(--color-accent)] hover:underline underline-offset-4"
+                  className="mt-4 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-violet-soft transition-colors hover:text-white"
+                  style={TECH_FONT}
                 >
-                  Preview the rules →
+                  Preview the rules <ArrowRight className="size-3.5" />
                 </Link>
               </div>
-              <div className="rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6">
-                <div className="text-[11px] uppercase tracking-[0.16em] text-ink-400">
+              <div className="rounded-[1.5rem] border border-border-strong bg-surface/45 p-6 backdrop-blur-md">
+                <div
+                  className="text-[11px] uppercase tracking-[0.16em] text-fg-dim"
+                  style={TECH_FONT}
+                >
                   Gas
                 </div>
-                <div className="mt-3 font-mono text-[18px] text-ink-50 tab-nums">
+                <div
+                  className="mt-3 font-mono text-[20px] tabular-nums text-fg"
+                  style={TECH_FONT}
+                >
                   ~$0.01
                 </div>
-                <p className="mt-1 text-[12px] text-ink-400">
+                <p
+                  className="mt-1 text-[12.5px] text-fg-dim"
+                  style={TECH_FONT}
+                >
                   One transaction · signed via zkLogin.
                 </p>
               </div>
@@ -548,26 +682,86 @@ export function OnboardingWizard() {
       </div>
 
       {step < 5 && (
-        <div className="flex items-center justify-between gap-3 border-t border-white/[0.05] pt-6">
-          <Button
-            variant="outline"
-            onClick={prev}
-            disabled={step === 0}
-            className="!h-11"
-          >
-            <ArrowLeft size={14} />
+        <div className="flex items-center justify-between gap-3 border-t border-border pt-6">
+          <SecondaryButton onClick={prev} disabled={step === 0}>
+            <ArrowLeft className="size-3.5" />
             Back
-          </Button>
-          <div className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-ink-500">
-            Step {String(step + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}
+          </SecondaryButton>
+          <div
+            className="hidden font-mono text-[11px] uppercase tracking-[0.16em] text-fg-dim sm:block"
+            style={TECH_FONT}
+          >
+            Step {String(step + 1).padStart(2, "0")} /{" "}
+            {String(STEPS.length).padStart(2, "0")}
           </div>
-          <Button onClick={next} className="!h-11">
+          <PrimaryButton onClick={next}>
             Continue
-            <ArrowRight size={14} />
-          </Button>
+            <ArrowRight className="size-4" />
+          </PrimaryButton>
         </div>
       )}
     </div>
+  );
+}
+
+function PrimaryButton({
+  children,
+  onClick,
+  className,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "group inline-flex h-11 items-center justify-center gap-2.5 rounded-full px-5 text-sm font-medium text-white transition-transform will-change-transform",
+        "hover:-translate-y-[1px] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40",
+        className
+      )}
+      style={{
+        background: BRAND_GRAD,
+        boxShadow:
+          "0 -4px 7px rgba(50,50,50,0.32) inset, 0 18px 36px -16px rgba(67,97,252,0.6)",
+        ...TECH_FONT,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SecondaryButton({
+  children,
+  onClick,
+  className,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border-strong bg-surface-2/40 px-5 text-sm font-medium text-fg-muted transition-colors hover:border-violet/40 hover:bg-surface-2/70 hover:text-fg",
+        "disabled:cursor-not-allowed disabled:opacity-30",
+        className
+      )}
+      style={TECH_FONT}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -583,17 +777,23 @@ function Mini({
   accent?: boolean;
 }) {
   return (
-    <div className="mt-4 flex items-center justify-between border-t border-white/[0.04] pt-3 first-of-type:mt-5 first-of-type:border-t-0 first-of-type:pt-5">
+    <div className="mt-4 flex items-center justify-between border-t border-border pt-4 first-of-type:mt-6 first-of-type:border-t-0 first-of-type:pt-6">
       <div>
-        <div className="text-[12px] text-ink-300">{k}</div>
+        <div className="text-[12.5px] text-fg-muted" style={TECH_FONT}>
+          {k}
+        </div>
         {hint && (
-          <div className="mt-0.5 text-[11px] text-ink-500">{hint}</div>
+          <div className="mt-0.5 text-[11px] text-fg-dim" style={TECH_FONT}>
+            {hint}
+          </div>
         )}
       </div>
       <span
-        className={`font-mono text-[15px] tab-nums ${
-          accent ? "text-[var(--color-accent)]" : "text-ink-50"
-        }`}
+        className={cn(
+          "font-mono text-[15px] tabular-nums",
+          accent ? "text-violet-soft" : "text-fg"
+        )}
+        style={TECH_FONT}
       >
         {v}
       </span>
@@ -612,11 +812,15 @@ function Stat({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-ink-400">{k}</span>
+      <span className="text-fg-dim" style={TECH_FONT}>
+        {k}
+      </span>
       <span
-        className={`font-mono tab-nums ${
-          accent ? "text-[var(--color-accent)]" : "text-ink-100"
-        }`}
+        className={cn(
+          "font-mono tabular-nums",
+          accent ? "text-violet-soft" : "text-fg-muted"
+        )}
+        style={TECH_FONT}
       >
         {v}
       </span>
@@ -637,19 +841,30 @@ function Confirm({
   hint: string;
   tone?: "accent";
 }) {
-  const color = tone === "accent" ? "text-[var(--color-accent)]" : "text-ink-50";
   return (
-    <li className="flex items-center justify-between gap-4 rounded-2xl border border-white/[0.05] bg-white/[0.015] p-4">
+    <li className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface-2/40 p-4">
       <div className="flex items-center gap-3">
-        <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-ink-200">
+        <span className="grid h-8 w-8 place-items-center rounded-xl border border-border-strong bg-surface-2/60 text-fg-muted">
           {icon}
         </span>
         <div>
-          <div className="text-ink-100">{k}</div>
-          <div className="mt-0.5 text-[11.5px] text-ink-400">{hint}</div>
+          <div className="text-fg" style={TECH_FONT}>
+            {k}
+          </div>
+          <div className="mt-0.5 text-[11.5px] text-fg-dim" style={TECH_FONT}>
+            {hint}
+          </div>
         </div>
       </div>
-      <span className={`font-mono text-[15px] tab-nums ${color}`}>{v}</span>
+      <span
+        className={cn(
+          "font-mono text-[15px] tabular-nums",
+          tone === "accent" ? "text-violet-soft" : "text-fg"
+        )}
+        style={TECH_FONT}
+      >
+        {v}
+      </span>
     </li>
   );
 }
