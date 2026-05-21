@@ -153,7 +153,7 @@ export function FAQ() {
 
           {/* Expanded state */}
           <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
-            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-20 pb-5 sm:px-12 sm:pt-24 lg:px-20 lg:pt-28 lg:pb-6">
+            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-16 pb-4 sm:px-12 sm:pt-20 lg:px-20 lg:pt-24 lg:pb-5">
               <h2
                 className="shrink-0 text-center text-[clamp(2rem,4.2vw,4.25rem)] font-normal leading-[1.05] tracking-[-0.015em] text-[#0a0a0a]"
                 style={{
@@ -171,7 +171,7 @@ export function FAQ() {
               </h2>
 
               {/* All items rendered inline — no inner scroll */}
-              <div className="faq-list mx-auto mt-6 w-full max-w-[820px] space-y-2 sm:space-y-2.5 lg:mt-8">
+              <div className="faq-list mx-auto mt-5 w-full max-w-[820px] space-y-1.5 sm:space-y-2 lg:mt-6">
                 {faq.items.map((item, i) => {
                   const isOpen = openIdx === i;
                   return (
@@ -189,7 +189,7 @@ export function FAQ() {
                           setOpenIdx((curr) => (curr === i ? null : i))
                         }
                         aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-3 text-left sm:px-9 sm:py-3.5"
+                        className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-2.5 text-left sm:px-9 sm:py-3"
                       >
                         <span
                           className="text-[15px] font-normal leading-snug text-[#0a0a0a] sm:text-[17px] lg:text-[18px]"
@@ -214,7 +214,7 @@ export function FAQ() {
                       </button>
                       {isOpen && (
                         <div
-                          className="px-7 pb-5 pt-1 text-[14px] font-normal leading-relaxed text-[#0a0a0a]/70 sm:px-9 sm:pb-6 lg:text-[15px]"
+                          className="px-7 pb-3.5 pt-0.5 text-[13.5px] font-normal leading-relaxed text-[#0a0a0a]/70 sm:px-9 sm:pb-4 lg:text-[14.5px]"
                           style={{
                             fontFamily:
                               "var(--font-tech), ui-sans-serif, system-ui",

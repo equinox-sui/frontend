@@ -10,10 +10,12 @@ import {
   Bell,
   ChevronDown,
 } from "lucide-react";
+
+// Wallet import retained for the sidebar nav item.
 import { useState } from "react";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
-import { ConnectWalletModal } from "@/components/dashboard/ConnectWalletModal";
+import { ConnectWalletButton } from "@/components/dashboard/ConnectWalletButton";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -25,14 +27,6 @@ const NAV = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [connectOpen, setConnectOpen] = useState(false);
-  const [connected, setConnected] = useState(false);
-
-  const closeConnect = () => {
-    setConnectOpen(false);
-    // mock: treat any modal close after a confirmed selection as "connected"
-    setConnected(true);
-  };
 
   return (
     <div className="relative flex min-h-screen flex-col bg-[var(--bg)] lg:flex-row">
@@ -134,30 +128,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setConnectOpen(true)}
-              className={cn(
-                "group inline-flex h-10 items-center gap-2 rounded-full pl-3 pr-4 text-[13px] font-medium transition-all",
-                connected
-                  ? "border border-[var(--color-positive)]/30 bg-[var(--color-positive)]/8 text-[var(--color-positive)]"
-                  : "border border-white/[0.08] bg-white/[0.02] text-ink-50 hover:border-white/20 hover:bg-white/[0.05]"
-              )}
-            >
-              <span
-                aria-hidden
-                className={cn(
-                  "grid h-6 w-6 place-items-center rounded-full",
-                  connected ? "bg-[var(--color-positive)]/15" : "bg-white/[0.06]"
-                )}
-              >
-                <Wallet size={12} />
-              </span>
-              {connected ? "Connected" : "Connect Wallet"}
-              {connected && (
-                <span className="ml-1 h-1.5 w-1.5 rounded-full bg-[var(--color-positive)] animate-pulse-soft" />
-              )}
-            </button>
+            <ConnectWalletButton />
             <button
               aria-label="Notifications"
               className="relative grid h-10 w-10 place-items-center rounded-full border border-white/[0.08] text-ink-200 transition-colors hover:bg-white/[0.04]"
@@ -170,8 +141,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <main className="px-5 py-8 sm:px-8 sm:py-10">{children}</main>
       </div>
-
-      <ConnectWalletModal open={connectOpen} onClose={closeConnect} />
     </div>
   );
 }
