@@ -1,36 +1,84 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
 import { mockPosition } from "@/data/mock";
 import { formatUSD } from "@/lib/format";
 
+const TECH: React.CSSProperties = {
+  fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
+};
+
 export function AllocationCard() {
+  const scallopFillRef = useRef<HTMLDivElement | null>(null);
+  const cetusFillRef = useRef<HTMLDivElement | null>(null);
+
   const total = mockPosition.allocations.scallop + mockPosition.allocations.cetus;
   const scallopPct = (mockPosition.allocations.scallop / total) * 100;
   const cetusPct = 100 - scallopPct;
 
+  useEffect(() => {
+    const s = scallopFillRef.current;
+    const c = cetusFillRef.current;
+    if (!s || !c) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      s.style.width = `${scallopPct}%`;
+      c.style.width = `${cetusPct}%`;
+      return;
+    }
+    gsap.fromTo(
+      s,
+      { width: 0 },
+      { width: `${scallopPct}%`, duration: 1.2, ease: "expo.out" }
+    );
+    gsap.fromTo(
+      c,
+      { width: 0 },
+      { width: `${cetusPct}%`, duration: 1.2, ease: "expo.out", delay: 0.1 }
+    );
+  }, [scallopPct, cetusPct]);
+
   return (
-    <article className="overflow-hidden rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6">
+    <article
+      className="relative overflow-hidden rounded-3xl border border-border-strong/60 bg-surface/45 p-6 backdrop-blur-md"
+      style={TECH}
+    >
       <div className="flex items-center justify-between">
-        <span className="text-[10.5px] uppercase tracking-[0.16em] text-ink-400">
+        <span className="text-[10.5px] uppercase tracking-[0.18em] text-fg-dim">
           Agent allocation
         </span>
-        <span className="font-mono text-[12px] text-ink-300 tab-nums">
+        <span className="font-mono text-[12px] text-fg-muted tab-nums">
           {formatUSD(total)} deployed
         </span>
       </div>
 
       <div className="mt-6 flex h-2.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
         <div
-          className="h-full bg-[var(--color-accent)]"
-          style={{ width: `${scallopPct}%` }}
+          ref={scallopFillRef}
+          className="h-full"
+          style={{
+            width: 0,
+            background:
+              "linear-gradient(90deg, #b6a8ff, #9181f5)",
+            boxShadow: "inset 0 0 6px rgba(145,129,245,0.4)",
+          }}
         />
         <div
-          className="h-full bg-[#7dd0ff]"
-          style={{ width: `${cetusPct}%` }}
+          ref={cetusFillRef}
+          className="h-full"
+          style={{
+            width: 0,
+            background:
+              "linear-gradient(90deg, #7df0ff, #5cd8ff)",
+            boxShadow: "inset 0 0 6px rgba(92,216,255,0.45)",
+          }}
         />
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-4">
         <AllocationRow
-          color="bg-[var(--color-accent)]"
+          dot="#9181f5"
+          glow="rgba(145,129,245,0.7)"
           name="Scallop"
           venue="USDC lending"
           amount={mockPosition.allocations.scallop}
@@ -38,7 +86,8 @@ export function AllocationCard() {
           apr="6.2%"
         />
         <AllocationRow
-          color="bg-[#7dd0ff]"
+          dot="#5cd8ff"
+          glow="rgba(92,216,255,0.7)"
           name="Cetus"
           venue="USDC/USDT LP"
           amount={mockPosition.allocations.cetus}
@@ -51,14 +100,16 @@ export function AllocationCard() {
 }
 
 function AllocationRow({
-  color,
+  dot,
+  glow,
   name,
   venue,
   amount,
   pct,
   apr,
 }: {
-  color: string;
+  dot: string;
+  glow: string;
   name: string;
   venue: string;
   amount: number;
@@ -66,20 +117,23 @@ function AllocationRow({
   apr: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/[0.05] bg-white/[0.015] p-4">
+    <div className="rounded-2xl border border-border-strong/60 bg-surface-2/40 p-4 transition-colors hover:border-border-strong">
       <div className="flex items-center gap-2">
-        <span className={`h-1.5 w-1.5 rounded-full ${color}`} />
-        <span className="text-[13.5px] text-ink-50">{name}</span>
-        <span className="ml-auto font-mono text-[11px] text-ink-400 tab-nums">
+        <span
+          className="h-1.5 w-1.5 rounded-full"
+          style={{ background: dot, boxShadow: `0 0 6px ${glow}` }}
+        />
+        <span className="text-[13.5px] text-fg">{name}</span>
+        <span className="ml-auto font-mono text-[11px] text-fg-dim tab-nums">
           {pct.toFixed(0)}%
         </span>
       </div>
-      <div className="mt-3 font-mono text-[18px] text-ink-50 tab-nums">
+      <div className="mt-3 font-mono text-[18px] text-fg tab-nums">
         {formatUSD(amount)}
       </div>
-      <div className="mt-1 flex items-center justify-between text-[11.5px] text-ink-400">
+      <div className="mt-1 flex items-center justify-between text-[11.5px] text-fg-dim">
         <span>{venue}</span>
-        <span className="font-mono text-[var(--color-positive)] tab-nums">
+        <span className="font-mono text-[var(--color-emerald-soft)] tab-nums">
           {apr} APR
         </span>
       </div>

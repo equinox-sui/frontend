@@ -5,15 +5,22 @@ import gsap from "gsap";
 import { mockPosition, SUI_PRICE } from "@/data/mock";
 import { formatUSD } from "@/lib/format";
 
+const TECH: React.CSSProperties = {
+  fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
+};
+
 function statusForHF(hf: number) {
-  if (hf >= 1.5) return { label: "Safe", tone: "positive", color: "#6ddf9b" };
-  if (hf >= 1.3) return { label: "Caution", tone: "warning", color: "#f0c34a" };
-  return { label: "Defense active", tone: "danger", color: "#ff6b6b" };
+  if (hf >= 1.5)
+    return { label: "Safe", color: "#16d9a8", soft: "#6cf2cc" };
+  if (hf >= 1.3)
+    return { label: "Caution", color: "#ffc46b", soft: "#ffd49a" };
+  return { label: "Defense active", color: "#ff7a90", soft: "#ff9aae" };
 }
 
 export function HealthGauge() {
   const ref = useRef<HTMLDivElement | null>(null);
   const arcRef = useRef<SVGCircleElement | null>(null);
+  const numRef = useRef<HTMLSpanElement | null>(null);
 
   const hf = mockPosition.healthFactor;
   const status = statusForHF(hf);
@@ -24,14 +31,17 @@ export function HealthGauge() {
   // Arc circumference
   const r = 86;
   const C = 2 * Math.PI * r;
-  const dash = C * 0.75; // 270deg arc
+  const dash = C * 0.75;
   const offset = dash * (1 - fill);
 
   useEffect(() => {
     const arc = arcRef.current;
+    const num = numRef.current;
     if (!arc) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
       arc.style.strokeDashoffset = String(offset);
+      if (num) num.textContent = hf.toFixed(2);
       return;
     }
     gsap.fromTo(
@@ -41,27 +51,51 @@ export function HealthGauge() {
         strokeDashoffset: offset,
         duration: 1.6,
         ease: "expo.out",
-      },
+      }
     );
-  }, [offset, dash]);
+    if (num) {
+      const obj = { v: 0 };
+      gsap.to(obj, {
+        v: hf,
+        duration: 1.5,
+        ease: "expo.out",
+        onUpdate: () => {
+          num.textContent = obj.v.toFixed(2);
+        },
+      });
+    }
+  }, [offset, dash, hf]);
 
   return (
     <article
       ref={ref}
-      className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55 p-6"
+      className="relative overflow-hidden rounded-3xl border border-border-strong/60 bg-surface/45 p-6 backdrop-blur-md"
+      style={TECH}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-[10.5px] uppercase tracking-[0.16em] text-ink-400">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-12 right-[-15%] h-44 w-44 rounded-full blur-3xl"
+        style={{ background: `${status.color}26` }}
+      />
+      <div className="relative flex items-center justify-between">
+        <span className="text-[10.5px] uppercase tracking-[0.18em] text-fg-dim">
           Health Factor
         </span>
         <span
-          className="rounded-full border px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em]"
+          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em]"
           style={{
             color: status.color,
-            borderColor: `${status.color}40`,
-            background: `${status.color}10`,
+            background: `${status.color}1a`,
+            boxShadow: `0 0 0 1px ${status.color}55`,
           }}
         >
+          <span
+            className="h-1.5 w-1.5 rounded-full animate-pulse-soft"
+            style={{
+              background: status.color,
+              boxShadow: `0 0 6px ${status.color}cc`,
+            }}
+          />
           {status.label}
         </span>
       </div>
@@ -74,8 +108,12 @@ export function HealthGauge() {
         >
           <defs>
             <linearGradient id="hf-track" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.06" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.03" />
+              <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.03)" />
+            </linearGradient>
+            <linearGradient id="hf-fill" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stopColor={status.color} />
+              <stop offset="100%" stopColor={status.soft} />
             </linearGradient>
           </defs>
           <circle
@@ -94,48 +132,51 @@ export function HealthGauge() {
             cy="100"
             r="86"
             fill="none"
-            stroke={status.color}
+            stroke="url(#hf-fill)"
             strokeWidth="10"
             strokeDasharray={`${dash} ${C}`}
             strokeDashoffset={dash}
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 12px ${status.color}80)`,
-              transition: "stroke 600ms ease",
+              filter: `drop-shadow(0 0 14px ${status.color}90)`,
             }}
           />
         </svg>
         <div className="flex flex-col items-center">
           <span
+            ref={numRef}
             className="text-[44px] font-medium leading-none tracking-tight tab-nums"
             style={{ color: status.color }}
           >
-            {hf.toFixed(2)}
+            0.00
           </span>
-          <span className="mt-2 text-[11px] uppercase tracking-[0.16em] text-ink-400">
+          <span className="mt-2 text-[11px] uppercase tracking-[0.18em] text-fg-dim">
             HF
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 border-t border-white/[0.04] pt-5">
-        <div>
-          <div className="text-[10.5px] uppercase tracking-[0.14em] text-ink-400">
-            Liquidation
-          </div>
-          <div className="mt-1.5 font-mono text-[15px] text-ink-50 tab-nums">
-            {formatUSD(mockPosition.liquidationPrice, { decimals: 2 })}
-          </div>
-        </div>
-        <div>
-          <div className="text-[10.5px] uppercase tracking-[0.14em] text-ink-400">
-            SUI now
-          </div>
-          <div className="mt-1.5 font-mono text-[15px] text-ink-50 tab-nums">
-            {formatUSD(SUI_PRICE, { decimals: 2 })}
-          </div>
-        </div>
+      <div className="relative grid grid-cols-2 gap-3 border-t border-border/60 pt-5">
+        <Stat
+          label="Liquidation"
+          value={formatUSD(mockPosition.liquidationPrice, { decimals: 2 })}
+        />
+        <Stat
+          label="SUI now"
+          value={formatUSD(SUI_PRICE, { decimals: 2 })}
+        />
       </div>
     </article>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-[10.5px] uppercase tracking-[0.16em] text-fg-dim">
+        {label}
+      </div>
+      <div className="mt-1.5 font-mono text-[15px] text-fg tab-nums">{value}</div>
+    </div>
   );
 }
