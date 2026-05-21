@@ -124,7 +124,7 @@ export function FAQ() {
   );
 
   return (
-    <section id="faq" ref={sectionRef} className="relative bg-white">
+    <section id="faq" ref={sectionRef} className="relative bg-bg">
       <div
         ref={pinRef}
         className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-bg lg:flex"
