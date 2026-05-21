@@ -223,8 +223,8 @@ export function Hero() {
             className="absolute inset-[10%] rounded-full opacity-70"
             style={{
               background:
-                "radial-gradient(circle, rgba(64,122,255,0.55) 0%, rgba(64,122,255,0.18) 40%, transparent 70%)",
-              filter: "blur(28px)",
+                "radial-gradient(circle, rgba(255,122,144,0.45) 0%, rgba(145,129,245,0.28) 40%, transparent 72%)",
+              filter: "blur(32px)",
             }}
           />
 
@@ -309,15 +309,15 @@ export function Hero() {
           >
             <div data-float className="relative h-full w-full">
               <Image
-                src="/bg-home.png"
-                alt="Sui — built natively on Sui"
+                src="/bg-new.png"
+                alt="Equinox — self-repaying loans on Sui"
                 fill
                 priority
                 sizes="(max-width: 768px) 80vw, 480px"
                 className="rounded-[28%] object-cover"
                 style={{
                   boxShadow:
-                    "0 40px 80px -20px rgba(64,122,255,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 60px -10px rgba(145,129,245,0.4)",
+                    "0 40px 80px -20px rgba(255,122,144,0.4), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 60px -10px rgba(92,216,255,0.4)",
                 }}
               />
               {/* Specular highlight overlay */}
@@ -326,7 +326,7 @@ export function Hero() {
                 className="pointer-events-none absolute inset-0 rounded-[28%]"
                 style={{
                   background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 60%, rgba(64,122,255,0.12) 100%)",
+                    "linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 60%, rgba(92,216,255,0.14) 100%)",
                   mixBlendMode: "screen",
                 }}
               />
