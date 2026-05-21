@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap } from "@/lib/gsap";
 import { hero } from "@/lib/content";
 import { cn } from "@/lib/cn";
+import { CoinLottie } from "../ui/coin-lottie";
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
@@ -474,51 +474,22 @@ export function Hero() {
             />
           </svg>
 
-          {/* Floating coin — main image with tilt */}
+          {/* Animated Sui crypto coin (Lottie) with tilt */}
           <div
             ref={floatRef}
-            className="relative h-[72%] w-[72%] cursor-pointer will-change-transform"
+            className="relative h-[84%] w-[84%] cursor-pointer will-change-transform"
             style={{ transformStyle: "preserve-3d" }}
           >
             <div data-float className="relative h-full w-full">
-              <div data-coin-pulse className="relative h-full w-full">
-                <Image
-                  src="/bg-new.png"
-                  alt="Equinox — self-repaying loans on Sui"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 80vw, 480px"
-                  className="rounded-[28%] object-cover"
-                  style={{
-                    boxShadow:
-                      "0 40px 80px -20px rgba(255,122,144,0.4), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 60px -10px rgba(92,216,255,0.4)",
-                  }}
-                />
-                {/* Specular highlight overlay */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-[28%]"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 60%, rgba(92,216,255,0.14) 100%)",
-                    mixBlendMode: "screen",
-                  }}
-                />
-                {/* Conic shimmer that catches the light on tilt */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-[28%] opacity-50"
-                  style={{
-                    background:
-                      "conic-gradient(from 220deg at 30% 0%, transparent 0deg, rgba(255,255,255,0.15) 24deg, transparent 60deg)",
-                    mixBlendMode: "screen",
-                  }}
-                />
-                {/* Inner ring */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-1 rounded-[26%] border border-white/10"
-                />
+              <div
+                data-coin-pulse
+                className="relative h-full w-full"
+                style={{
+                  filter:
+                    "drop-shadow(0 40px 60px rgba(67,97,252,0.35)) drop-shadow(0 0 40px rgba(145,129,245,0.25))",
+                }}
+              >
+                <CoinLottie className="h-full w-full" />
               </div>
             </div>
           </div>
