@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import { Modal } from "./Modal";
 import { Button } from "@/components/ui/Button";
+import { auth } from "@/lib/auth";
 
 const PROVIDERS = [
   {
@@ -47,6 +48,16 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ open, onClose }: LoginModalProps) {
+  // README §2: after the user picks a provider, frontend decides where to
+  // route. With our mock state, a fresh sign-in (no existing position) goes
+  // to the onboarding wizard; an existing user lands on /dashboard.
+  const finishSignIn = () => {
+    auth.signIn();
+    onClose();
+    const target = auth.hasPosition() ? "/dashboard" : "/onboarding";
+    window.location.href = target;
+  };
+
   return (
     <Modal
       open={open}
@@ -61,6 +72,8 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           {PROVIDERS.map((p) => (
             <button
               key={p.id}
+              type="button"
+              onClick={finishSignIn}
               className="group flex w-full items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3.5 text-left transition-all hover:border-white/20 hover:bg-white/[0.04]"
             >
               <span className="flex items-center gap-3 text-[14px] text-ink-50">
@@ -83,8 +96,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              onClose();
-              window.location.href = "/dashboard";
+              finishSignIn();
             }}
             className="space-y-2.5"
           >

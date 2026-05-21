@@ -18,6 +18,7 @@ import { Stepper } from "./Stepper";
 import { riskProfiles, mockUser, SUI_PRICE } from "@/data/mock";
 import { formatUSD, formatSUI } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { auth } from "@/lib/auth";
 
 const STEPS = ["Asset", "Amount", "Mode", "Payoff", "Risk", "Review"];
 
@@ -626,7 +627,13 @@ export function OnboardingWizard() {
                 <SecondaryButton onClick={prev} className="flex-1">
                   Back
                 </SecondaryButton>
-                <PrimaryButton className="flex-[1.4]">
+                <PrimaryButton
+                  className="flex-[1.4]"
+                  onClick={() => {
+                    auth.openPosition();
+                    window.location.href = "/dashboard";
+                  }}
+                >
                   <span>Confirm &amp; activate</span>
                   <ArrowRight className="size-4" />
                 </PrimaryButton>

@@ -1,15 +1,16 @@
 "use client";
 
-import { useRef } from "react";
-import Link from "next/link";
+import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { gsap, registerGsap } from "@/lib/gsap";
 import { hero } from "@/lib/content";
 import { cn } from "@/lib/cn";
+import { LoginModal } from "@/components/modals/LoginModal";
 
 export function StartCTA() {
   const ref = useRef<HTMLElement>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   useGSAP(
     () => {
@@ -78,8 +79,9 @@ export function StartCTA() {
             </div>
 
             <div className="mt-9">
-              <Link
-                href="/dashboard"
+              <button
+                type="button"
+                onClick={() => setLoginOpen(true)}
                 className="group inline-flex items-center gap-3 rounded-full px-5 py-2.5 text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] transition-transform hover:-translate-y-0.5"
                 style={{ background: "var(--gradient-brand)" }}
               >
@@ -98,7 +100,7 @@ export function StartCTA() {
                 >
                   <ArrowUpRight className="size-3.5" />
                 </span>
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -130,6 +132,7 @@ export function StartCTA() {
           </h2>
         </div>
       </div>
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </section>
   );
 }

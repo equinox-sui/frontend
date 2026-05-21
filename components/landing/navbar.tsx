@@ -6,12 +6,13 @@ import { Menu, X, ArrowUpRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap } from "@/lib/gsap";
 import { nav } from "@/lib/content";
-import { Button } from "./ui/button";
 import { cn } from "@/lib/cn";
+import { LoginModal } from "@/components/modals/LoginModal";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
 
@@ -113,8 +114,9 @@ export function Navbar() {
         {/* Right — CTA pill */}
         <div className="ml-auto hidden md:block">
           <span className="nav-item inline-block">
-            <Link
-              href={nav.cta.href}
+            <button
+              type="button"
+              onClick={() => setLoginOpen(true)}
               className="group inline-flex items-center gap-2.5 rounded-full px-5 py-2 text-sm font-medium text-white shadow-[0_-4px_7px_rgba(50,50,50,0.32)_inset] transition-transform hover:-translate-y-[1px]"
               style={{ background: "var(--gradient-brand)" }}
             >
@@ -125,7 +127,7 @@ export function Navbar() {
               >
                 <ArrowUpRight className="size-3.5" />
               </span>
-            </Link>
+            </button>
           </span>
         </div>
 
@@ -156,13 +158,28 @@ export function Navbar() {
               </a>
             ))}
             <div className="m-link mt-2 flex justify-center">
-              <Button href={nav.cta.href} variant="primary" withArrow>
-                {nav.cta.label}
-              </Button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setLoginOpen(true);
+                }}
+                className="group inline-flex items-center gap-2.5 rounded-full px-5 py-2 text-sm font-medium text-white shadow-[0_-4px_7px_rgba(50,50,50,0.32)_inset]"
+                style={{ background: "var(--gradient-brand)" }}
+              >
+                <span>{nav.cta.label}</span>
+                <span
+                  aria-hidden
+                  className="grid size-6 place-items-center rounded-full bg-white/15"
+                >
+                  <ArrowUpRight className="size-3.5" />
+                </span>
+              </button>
             </div>
           </div>
         </div>
       )}
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </div>
   );
 }

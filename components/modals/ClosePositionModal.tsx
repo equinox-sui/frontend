@@ -6,6 +6,7 @@ import { Modal } from "./Modal";
 import { Button } from "@/components/ui/Button";
 import { mockPosition } from "@/data/mock";
 import { formatUSD } from "@/lib/format";
+import { auth } from "@/lib/auth";
 
 interface ClosePositionModalProps {
   open: boolean;
@@ -44,6 +45,18 @@ export function ClosePositionModal({ open, onClose }: ClosePositionModalProps) {
         return idx + 1;
       });
     }, 700);
+  };
+
+  // README §6 success state: actual position-close is committed when the
+  // user dismisses the success screen, so the modal can fully render
+  // "Settled. Wallet restored." before the dashboard flips to empty state.
+  const finishAndHome = () => {
+    auth.closePosition();
+    window.location.href = "/";
+  };
+  const finishAndReopen = () => {
+    auth.closePosition();
+    window.location.href = "/onboarding";
   };
 
   const total = mockPosition.allocations.scallop + mockPosition.allocations.cetus;
@@ -156,15 +169,10 @@ export function ClosePositionModal({ open, onClose }: ClosePositionModalProps) {
             <Row k="Total time" v="4 months 12 days" />
           </div>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-            <Button variant="outline" onClick={close} className="flex-1">
+            <Button variant="outline" onClick={finishAndHome} className="flex-1">
               Back to home
             </Button>
-            <Button
-              onClick={() => {
-                window.location.href = "/onboarding";
-              }}
-              className="flex-1"
-            >
+            <Button onClick={finishAndReopen} className="flex-1">
               Open a new position
             </Button>
           </div>

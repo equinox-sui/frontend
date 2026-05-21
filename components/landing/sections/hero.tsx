@@ -1,18 +1,19 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ArrowUpRight, Plus } from "lucide-react";
-import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap } from "@/lib/gsap";
 import { hero } from "@/lib/content";
 import { cn } from "@/lib/cn";
+import { LoginModal } from "@/components/modals/LoginModal";
 import { CoinLottie } from "../ui/coin-lottie";
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
   const floatRef = useRef<HTMLDivElement>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   useGSAP(
     () => {
@@ -291,8 +292,9 @@ export function Hero() {
           </div>
 
           <div className="hero-cta-row mt-9">
-            <Link
-              href={hero.openApp.href}
+            <button
+              type="button"
+              onClick={() => setLoginOpen(true)}
               className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-2.5 text-sm font-medium text-bg shadow-[0_-4px_7px_rgba(225,225,225,0.32)_inset] transition-colors hover:bg-[#fafafa]"
             >
               <span>{hero.openApp.label}</span>
@@ -303,7 +305,7 @@ export function Hero() {
               >
                 <ArrowUpRight className="size-3.5 text-white transition-transform duration-300 group-hover:translate-x-[1px] group-hover:-translate-y-[1px]" />
               </span>
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -536,6 +538,7 @@ export function Hero() {
           />
         </div>
       </div>
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </section>
   );
 }
