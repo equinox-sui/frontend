@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap } from "@/lib/gsap";
@@ -13,8 +12,7 @@ type Card = {
   title: string;
   href: string;
   external?: boolean;
-  image: string;
-  alt: string;
+  brand: "equinox-core" | "walrus";
 };
 
 const CARDS: Card[] = [
@@ -22,15 +20,13 @@ const CARDS: Card[] = [
     title: "Audit-ready",
     href: "https://github.com/EzraNahumury",
     external: true,
-    image: "/a1.png",
-    alt: "Equinox Agent open source",
+    brand: "equinox-core",
   },
   {
     title: "Manifesto on Walrus",
     href: "https://docs.sui.io/",
     external: true,
-    image: "/a2.png",
-    alt: "Immutable manifesto pinned to Walrus",
+    brand: "walrus",
   },
 ];
 
@@ -152,7 +148,7 @@ export function SecurityIntegrations() {
               className="text-sm leading-relaxed text-fg-muted sm:text-[15px]"
               style={{ fontFamily: "var(--font-tech), ui-sans-serif, system-ui" }}
             >
-              Your collateral never leaves the position contract, the agent's
+              Your collateral never leaves the position contract, the agent&apos;s
               behavior is pinned to an immutable manifesto on Walrus, and every
               borrow, lend, and defense event is recorded onchain. A formal
               third-party audit is scheduled ahead of mainnet launch on Sui.
@@ -182,12 +178,19 @@ export function SecurityIntegrations() {
 
               {/* Logo plate */}
               <div className="relative mx-5 mt-3 flex flex-1 items-center justify-center overflow-hidden rounded-[12px] bg-gradient-to-br from-[#f5f6fa] to-[#e6e9f1]">
-                <Image
-                  src={c.image}
-                  alt={c.alt}
-                  fill
-                  sizes="200px"
-                  className="object-contain p-5"
+                <BrandChip kind={c.brand} />
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(rgba(15,15,15,0.06) 1px, transparent 1px)",
+                    backgroundSize: "6px 6px",
+                    maskImage:
+                      "radial-gradient(ellipse at center, transparent 55%, black 90%)",
+                    WebkitMaskImage:
+                      "radial-gradient(ellipse at center, transparent 55%, black 90%)",
+                  }}
                 />
               </div>
 
@@ -240,5 +243,49 @@ export function SecurityIntegrations() {
         </div>
       </div>
     </section>
+  );
+}
+
+function BrandChip({ kind }: { kind: "equinox-core" | "walrus" }) {
+  if (kind === "equinox-core") {
+    return (
+      <div
+        className="relative z-10 inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_8px_22px_-12px_rgba(15,15,15,0.35)]"
+        style={{
+          fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
+        }}
+      >
+        <span
+          aria-hidden
+          className="grid size-6 place-items-center rounded-md text-[#0a0a0a]"
+        >
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="8 5 3 12 8 19" />
+            <polyline points="16 5 21 12 16 19" />
+          </svg>
+        </span>
+        <span className="text-[14px] font-semibold tracking-tight text-[#0a0a0a]">
+          Equinox <span className="font-medium text-[#0a0a0a]/65">Core</span>
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="relative z-10 inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_8px_22px_-12px_rgba(15,15,15,0.35)]"
+      style={{
+        fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
+      }}
+    >
+      <span aria-hidden className="grid size-6 place-items-center text-[#0a0a0a]">
+        <svg viewBox="0 0 24 24" className="size-4" fill="none" strokeWidth="2" stroke="currentColor" strokeLinejoin="round">
+          <path d="M12 2 3 7v10l9 5 9-5V7z" />
+        </svg>
+      </span>
+      <span className="text-[14px] font-semibold tracking-tight text-[#0a0a0a]">
+        Walrus <span className="font-medium text-[#0a0a0a]/65">pinned</span>
+      </span>
+    </div>
   );
 }

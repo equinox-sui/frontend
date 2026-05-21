@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, Plus, Minus } from "lucide-react";
 import { gsap, ScrollTrigger, registerGsap } from "@/lib/gsap";
@@ -9,7 +9,25 @@ import { faq } from "@/lib/content";
 export function FAQ() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+
+  useEffect(() => {
+    if (openIdx === null) return;
+    const el = itemRefs.current[openIdx];
+    if (!el) return;
+    const scroller = el.closest("[data-lenis-prevent]") as HTMLElement | null;
+    if (!scroller) return;
+    // Wait for the answer panel to render, then scroll the question + answer into view inside the list.
+    const id = window.setTimeout(() => {
+      const sRect = scroller.getBoundingClientRect();
+      const eRect = el.getBoundingClientRect();
+      const target =
+        scroller.scrollTop + (eRect.top - sRect.top) - 12;
+      scroller.scrollTo({ top: target, behavior: "smooth" });
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [openIdx]);
 
   useGSAP(
     () => {
@@ -159,10 +177,10 @@ export function FAQ() {
           </div>
 
           {/* Expanded state — reveals as window grows */}
-          <div className="faq-expanded absolute inset-0 flex flex-col overflow-hidden opacity-0">
-            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col overflow-hidden px-7 pt-20 sm:px-12 sm:pt-24 lg:px-20 lg:pt-28">
+          <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
+            <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col px-7 pt-20 sm:px-12 sm:pt-24 lg:px-20 lg:pt-28">
               <h2
-                className="text-[clamp(1.5rem,3.4vw,3.6rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#0a0a0a]"
+                className="shrink-0 text-[clamp(1.5rem,3.4vw,3.6rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#0a0a0a]"
                 style={{
                   fontFamily:
                     "var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system",
@@ -177,13 +195,25 @@ export function FAQ() {
                 </span>
               </h2>
 
-              <div className="mx-auto mt-10 flex w-full max-w-[1120px] flex-col lg:mt-12">
-                <div className="faq-list space-y-3 pr-1 sm:space-y-3.5">
+              <div
+                data-lenis-prevent
+                className="mx-auto mt-10 flex w-full max-w-[1120px] min-h-0 flex-1 flex-col overflow-y-auto pr-1 lg:mt-12 [scrollbar-width:thin]"
+                style={{
+                  maskImage:
+                    "linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 24px), transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 24px), transparent 100%)",
+                }}
+              >
+                <div className="faq-list space-y-3 pb-6 pr-1 sm:space-y-3.5">
                   {faq.items.map((item, i) => {
                     const isOpen = openIdx === i;
                     return (
                       <div
                         key={item.q}
+                        ref={(el) => {
+                          itemRefs.current[i] = el;
+                        }}
                         className={`faq-item transition-colors ${
                           isOpen
                             ? "rounded-[36px] bg-[#0a0a0a]/[0.05]"
@@ -236,7 +266,7 @@ export function FAQ() {
               </div>
 
               {/* Footer — spans the WIDER outer container (not constrained to accordion's max-w) */}
-              <div className="faq-footer mt-8 flex flex-col items-start justify-between gap-5 pb-6 sm:flex-row sm:items-center lg:mt-10 lg:pb-8">
+              <div className="faq-footer mt-6 flex shrink-0 flex-col items-start justify-between gap-5 pb-6 sm:flex-row sm:items-center lg:mt-8 lg:pb-8">
                 <div
                   className="flex max-w-xl items-start gap-3 text-[15px] leading-snug text-[#0a0a0a]/55 sm:text-base lg:text-[17px]"
                   style={{

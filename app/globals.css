@@ -29,7 +29,11 @@
   --color-amber: #ffc46b;
   --color-rose: #ff7a90;
 
-  --font-tech: var(--font-space-grotesk);
+  /* Unified body/tech face — pinned to Geist Sans so headings + body match.
+     (Space Grotesk variable is still loaded by layout.tsx and remains
+     available as --font-space-grotesk for one-off use, but nothing in the
+     landing references it directly anymore.) */
+  --font-tech: var(--font-geist-sans);
 
   --radius-pill: 57px;
   --radius-card: 1.5rem;
