@@ -84,7 +84,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
             onSubmit={(e) => {
               e.preventDefault();
               onClose();
-              window.location.href = "/onboarding";
+              window.location.href = "/dashboard";
             }}
             className="space-y-2.5"
           >

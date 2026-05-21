@@ -79,7 +79,7 @@ export function StartCTA() {
 
             <div className="mt-9">
               <Link
-                href="/onboarding"
+                href="/dashboard"
                 className="group inline-flex items-center gap-3 rounded-full px-5 py-2.5 text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] transition-transform hover:-translate-y-0.5"
                 style={{ background: "var(--gradient-brand)" }}
               >

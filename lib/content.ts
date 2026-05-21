@@ -6,7 +6,7 @@ export const nav = {
     { label: "FAQ", href: "#faq" },
     { label: "Docs", href: "#academy" },
   ],
-  cta: { label: "Get Started", href: "/onboarding" },
+  cta: { label: "Get Started", href: "/dashboard" },
 };
 
 export const hero = {
@@ -14,7 +14,7 @@ export const hero = {
   title: ["Self-repaying loans,", "now powered by", "an agent on Sui."],
   subtitle:
     "Deposit SUI. Pick a risk profile. The agent borrows USDC at the best rate, lends it where yield is highest, and uses the spread to pay off your debt. You manage nothing.",
-  ctaPrimary: { label: "Get Started", href: "/onboarding" },
+  ctaPrimary: { label: "Get Started", href: "/dashboard" },
   ctaSecondary: { label: "See how it works", href: "#how" },
   stats: [
     { value: "0", label: "Manual work for the user" },
@@ -37,7 +37,7 @@ export const hero = {
   ] as const,
   description:
     "Equinox Agent removes everything DeFi makes you do — no Health Factor watching, no manual repayments, no liquidation panic, no vault hunting. One deposit. One risk profile. The agent does the rest.",
-  openApp: { label: "Get Started", href: "/onboarding" },
+  openApp: { label: "Get Started", href: "/dashboard" },
 };
 
 export const whatYouCanDo = {
@@ -327,7 +327,7 @@ export const ctaSection = {
   title: "Open your first self-repaying loan in 60 seconds.",
   body:
     "Sign in with Google. Deposit SUI. Pick a profile. The agent does the rest. Close any time — your collateral comes back whole.",
-  primary: { label: "Get Started", href: "/onboarding" },
+  primary: { label: "Get Started", href: "/dashboard" },
   secondary: { label: "Read the docs", href: "https://github.com/EzraNahumury" },
 };
 
