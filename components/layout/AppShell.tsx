@@ -7,14 +7,12 @@ import {
   Wallet,
   ScrollText,
   Settings,
-  LogOut,
   Bell,
   ChevronDown,
 } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
-import { mockUser } from "@/data/mock";
 import { ConnectWalletModal } from "@/components/dashboard/ConnectWalletModal";
 
 const NAV = [
@@ -121,32 +119,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-        <div
-          className={cn(
-            "border-t border-white/[0.05] p-4",
-            mobileOpen ? "block" : "hidden lg:block",
-          )}
-        >
-          <div className="flex items-center gap-3 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2.5">
-            <div className="grid h-8 w-8 place-items-center rounded-full bg-[var(--color-accent)]/15 text-[12px] font-medium text-[var(--color-accent)]">
-              {mockUser.name.charAt(0)}
-            </div>
-            <div className="flex min-w-0 flex-1 flex-col leading-tight">
-              <span className="truncate text-[12.5px] text-ink-50">
-                {mockUser.name}
-              </span>
-              <span className="truncate text-[11px] text-ink-400">
-                {mockUser.email}
-              </span>
-            </div>
-            <button
-              aria-label="Logout"
-              className="grid h-8 w-8 place-items-center rounded-lg text-ink-400 hover:bg-white/[0.04] hover:text-ink-50"
-            >
-              <LogOut size={14} />
-            </button>
-          </div>
-        </div>
       </aside>
 
       {/* Main */}
