@@ -85,9 +85,11 @@
 }
 
 :root {
-  --bg: #050504;
-  --bg-elev: #0a0a09;
-  --bg-card: #111110;
+  /* Aligned with --color-bg (#0f0f0f) so body, .bg-bg utility, and the
+     FAQ pin window all paint the same shade — no seam between sections. */
+  --bg: #0f0f0f;
+  --bg-elev: #131512;
+  --bg-card: #191919;
   --border: rgba(255, 255, 255, 0.06);
   --border-strong: rgba(255, 255, 255, 0.12);
   --text: #ededeb;
