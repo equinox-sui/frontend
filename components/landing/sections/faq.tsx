@@ -155,23 +155,23 @@ export function FAQ() {
           <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
             <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-24 pb-6 sm:px-12 sm:pt-28 lg:px-20 lg:pt-36 lg:pb-8">
               <h2
-                className="shrink-0 text-[clamp(1.5rem,3vw,3rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#0a0a0a]"
+                className="shrink-0 text-center text-[clamp(2rem,4.2vw,4.25rem)] font-normal leading-[1.05] tracking-[-0.015em] text-[#0a0a0a]"
                 style={{
                   fontFamily:
                     "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
                 }}
               >
-                <span className="inline-flex flex-nowrap items-baseline gap-x-3 sm:gap-x-5 lg:gap-x-7 whitespace-nowrap">
+                <span className="inline-flex flex-nowrap items-baseline gap-x-4 whitespace-nowrap sm:gap-x-6 lg:gap-x-8">
                   <span className="faq-headline-word inline-block">Frequently</span>
-                  <span className="faq-headline-word inline-block h-[2px] w-8 self-end translate-y-[-0.45em] bg-[#0a0a0a]/40 sm:w-14 lg:w-20" />
+                  <span className="faq-headline-word inline-block h-[1.5px] w-16 self-end translate-y-[-0.5em] bg-[#0a0a0a]/30 sm:w-28 lg:w-40" />
                   <span className="faq-headline-word inline-block">Asked</span>
-                  <span className="faq-headline-word inline-block h-[2px] w-8 self-end translate-y-[-0.45em] bg-[#0a0a0a]/40 sm:w-14 lg:w-20" />
+                  <span className="faq-headline-word inline-block h-[1.5px] w-16 self-end translate-y-[-0.5em] bg-[#0a0a0a]/30 sm:w-28 lg:w-40" />
                   <span className="faq-headline-word inline-block">Questions</span>
                 </span>
               </h2>
 
               {/* All items rendered inline — no inner scroll */}
-              <div className="faq-list mx-auto mt-6 w-full max-w-[1120px] space-y-2 sm:space-y-2.5 lg:mt-8">
+              <div className="faq-list mx-auto mt-8 w-full max-w-[820px] space-y-2.5 sm:space-y-3 lg:mt-10">
                 {faq.items.map((item, i) => {
                   const isOpen = openIdx === i;
                   return (
@@ -189,10 +189,10 @@ export function FAQ() {
                           setOpenIdx((curr) => (curr === i ? null : i))
                         }
                         aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-5 rounded-full px-6 py-3 text-left sm:px-8 sm:py-3.5"
+                        className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-4 text-left sm:px-9 sm:py-4"
                       >
                         <span
-                          className="text-[15px] font-medium leading-snug text-[#0a0a0a] sm:text-base lg:text-[17px]"
+                          className="text-[15px] font-normal leading-snug text-[#0a0a0a] sm:text-[17px] lg:text-[18px]"
                           style={{
                             fontFamily:
                               "var(--font-tech), ui-sans-serif, system-ui",
@@ -202,19 +202,19 @@ export function FAQ() {
                         </span>
                         <span
                           aria-hidden
-                          className="grid size-10 shrink-0 place-items-center rounded-full text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] sm:size-11"
+                          className="grid size-11 shrink-0 place-items-center rounded-full text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] sm:size-12"
                           style={{ background: "var(--gradient-brand)" }}
                         >
                           {isOpen ? (
-                            <Minus className="size-4" />
+                            <Minus className="size-[18px]" />
                           ) : (
-                            <Plus className="size-4" />
+                            <Plus className="size-[18px]" />
                           )}
                         </span>
                       </button>
                       {isOpen && (
                         <div
-                          className="px-6 pb-4 pt-1 text-sm leading-relaxed text-[#0a0a0a]/70 sm:px-8 sm:pb-5 lg:text-[15px]"
+                          className="px-7 pb-5 pt-1 text-[14px] font-normal leading-relaxed text-[#0a0a0a]/70 sm:px-9 sm:pb-6 lg:text-[15px]"
                           style={{
                             fontFamily:
                               "var(--font-tech), ui-sans-serif, system-ui",
