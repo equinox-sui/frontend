@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ArrowUpRight, Lock, Activity, Wallet } from "lucide-react";
 import { mockPosition, SUI_PRICE } from "@/data/mock";
-import { formatUSD, formatSUI } from "@/lib/format";
+import { formatUSD } from "@/lib/format";
 import { WithdrawModal } from "@/components/modals/WithdrawModal";
 
 const TECH: React.CSSProperties = {

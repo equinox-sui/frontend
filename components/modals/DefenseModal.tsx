@@ -10,14 +10,32 @@ interface DefenseModalProps {
   event?: ActivityEvent;
 }
 
-export function DefenseModal({ open, onClose }: DefenseModalProps) {
+function formatEventDate(iso?: string) {
+  if (!iso) return undefined;
+  const d = new Date(iso);
+  const date = d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  const time = d.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+  });
+  return `${date} · ${time} UTC`;
+}
+
+export function DefenseModal({ open, onClose, event }: DefenseModalProps) {
   return (
     <Modal
       open={open}
       onClose={onClose}
       maxWidthClassName="max-w-[520px]"
       title="Defense triggered"
-      subtitle="Mar 15, 2026 · 14:22 UTC"
+      subtitle={formatEventDate(event?.timestamp) ?? "Recent"}
     >
       <div className="px-6 pb-7 pt-5 space-y-6">
         <div className="flex items-start gap-4 rounded-2xl border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/8 p-4">

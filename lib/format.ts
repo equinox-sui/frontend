@@ -16,12 +16,7 @@ export function formatSUI(value: number, decimals = 2) {
   }).format(value);
 }
 
-export function formatPercent(value: number, decimals = 1) {
-  return `${value.toFixed(decimals)}%`;
-}
-
-export function relativeTime(iso: string) {
-  const now = Date.now();
+export function relativeTime(iso: string, now: number = Date.now()) {
   const then = new Date(iso).getTime();
   const diff = Math.max(0, now - then);
   const min = 60_000;

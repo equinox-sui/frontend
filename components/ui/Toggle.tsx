@@ -31,7 +31,7 @@ export function Toggle({
       className={cn(
         "relative h-6 w-10 shrink-0 rounded-full transition-colors",
         on
-          ? "bg-[var(--color-accent)]"
+          ? "bg-[var(--color-violet)] shadow-[0_0_10px_rgba(145,129,245,0.6)]"
           : "bg-white/[0.08] border border-white/[0.08]",
         disabled && "opacity-40 cursor-not-allowed",
       )}

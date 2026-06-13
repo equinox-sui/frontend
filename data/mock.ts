@@ -30,7 +30,9 @@ export const mockPosition = {
     cetus: 530,
   },
   spreadCapturedTotal: 732,
-  daysActive: 132,
+  daysActive: 156, // 2026-01-08 → 2026-06-13
+  manifestoBlobUrl:
+    "https://walrus.testnet.sui.io/v1/1f0e9b2a7c4d6f1e8a5b3c9d2e4f7a1bcda",
 };
 
 export const repaymentProgress = {
@@ -56,11 +58,23 @@ export interface ActivityEvent {
   amount?: number;
 }
 
+/**
+ * Fixed "now" for the mock world (the app's documented date) so every
+ * timestamp below is deterministic — no module-scope Date.now() that would
+ * differ between the server build and client hydration. Date.parse is a pure
+ * computation (no clock read), safe at module scope.
+ */
+export const MOCK_NOW = Date.parse("2026-06-13T14:00:00Z");
+const MIN = 60_000;
+const HR = 60 * MIN;
+const DAY = 24 * HR;
+const ago = (ms: number) => new Date(MOCK_NOW - ms).toISOString();
+
 export const activityFeed: ActivityEvent[] = [
   {
     id: "evt_1",
     kind: "spread",
-    timestamp: new Date(Date.now() - 2 * 60_000).toISOString(),
+    timestamp: ago(2 * MIN),
     title: "Spread captured",
     detail: "Debt reduced via Scallop interest delta",
     amount: 0.42,
@@ -68,14 +82,14 @@ export const activityFeed: ActivityEvent[] = [
   {
     id: "evt_2",
     kind: "rebalance",
-    timestamp: new Date(Date.now() - 4 * 60 * 60_000).toISOString(),
+    timestamp: ago(4 * HR),
     title: "Rebalanced allocation",
     detail: "Shifted $50 from Scallop into Cetus LP (APR delta 0.71%)",
   },
   {
     id: "evt_3",
     kind: "spread",
-    timestamp: new Date(Date.now() - 8 * 60 * 60_000).toISOString(),
+    timestamp: ago(8 * HR),
     title: "Spread captured",
     detail: "Debt reduced via Cetus LP fees",
     amount: 0.38,
@@ -83,7 +97,7 @@ export const activityFeed: ActivityEvent[] = [
   {
     id: "evt_4",
     kind: "shadow",
-    timestamp: new Date(Date.now() - 24 * 60 * 60_000).toISOString(),
+    timestamp: ago(DAY),
     title: "Shadow Wallet topped up",
     detail: "SUI appreciation +2.1%, $5.20 routed to Shadow",
     amount: 5.2,
@@ -91,14 +105,14 @@ export const activityFeed: ActivityEvent[] = [
   {
     id: "evt_5",
     kind: "defense",
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60_000).toISOString(),
+    timestamp: ago(2 * DAY),
     title: "Defense triggered",
     detail: "Health Factor restored from 1.28 → 1.55",
   },
   {
     id: "evt_6",
     kind: "spread",
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60_000).toISOString(),
+    timestamp: ago(3 * DAY),
     title: "Spread captured",
     detail: "Aggregated yield from both venues",
     amount: 1.14,
@@ -106,7 +120,7 @@ export const activityFeed: ActivityEvent[] = [
   {
     id: "evt_7",
     kind: "deposit",
-    timestamp: new Date(Date.now() - 132 * 24 * 60 * 60_000).toISOString(),
+    timestamp: mockPosition.openedAt,
     title: "Position opened",
     detail: "1,000 SUI deposited, $1,925 USDC borrowed",
   },

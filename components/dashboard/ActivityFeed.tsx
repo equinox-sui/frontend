@@ -3,20 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import {
-  Zap,
-  RefreshCw,
-  Wallet,
-  ShieldAlert,
-  Coins,
-  ArrowDownLeft,
-} from "lucide-react";
-import {
   activityFeed,
+  MOCK_NOW,
   type ActivityEvent,
   type ActivityKind,
 } from "@/data/mock";
 import { formatUSD, relativeTime } from "@/lib/format";
 import { DefenseModal } from "@/components/modals/DefenseModal";
+import {
+  SpreadIcon,
+  RebalanceIcon,
+  ShadowWalletIcon,
+  DefenseIcon,
+  DepositIcon,
+  WithdrawIcon,
+} from "./ActivityIcons";
 
 const TECH: React.CSSProperties = {
   fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
@@ -27,37 +28,37 @@ const KIND_META: Record<
   { icon: React.ComponentType<{ size?: number }>; color: string; ring: string; bg: string }
 > = {
   spread: {
-    icon: Zap,
+    icon: SpreadIcon,
     color: "#b6a8ff",
     ring: "rgba(145,129,245,0.40)",
     bg: "rgba(145,129,245,0.10)",
   },
   rebalance: {
-    icon: RefreshCw,
+    icon: RebalanceIcon,
     color: "#5cd8ff",
     ring: "rgba(92,216,255,0.35)",
     bg: "rgba(92,216,255,0.08)",
   },
   shadow: {
-    icon: Wallet,
+    icon: ShadowWalletIcon,
     color: "#ff9aae",
     ring: "rgba(255,122,144,0.40)",
     bg: "rgba(255,122,144,0.10)",
   },
   defense: {
-    icon: ShieldAlert,
+    icon: DefenseIcon,
     color: "#ff7a90",
     ring: "rgba(255,122,144,0.45)",
     bg: "rgba(255,122,144,0.12)",
   },
   deposit: {
-    icon: Coins,
+    icon: DepositIcon,
     color: "#ffd49a",
     ring: "rgba(255,196,107,0.40)",
     bg: "rgba(255,196,107,0.10)",
   },
   withdraw: {
-    icon: ArrowDownLeft,
+    icon: WithdrawIcon,
     color: "#c9d3cf",
     ring: "rgba(255,255,255,0.18)",
     bg: "rgba(255,255,255,0.04)",
@@ -174,7 +175,7 @@ export function ActivityFeed() {
                     <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                       <span className="text-[14px] text-fg">{evt.title}</span>
                       <span className="font-mono text-[11.5px] uppercase tracking-[0.1em] text-fg-dim">
-                        {relativeTime(evt.timestamp)}
+                        {relativeTime(evt.timestamp, MOCK_NOW)}
                       </span>
                     </div>
                     <p className="mt-1 text-[12.5px] leading-relaxed text-fg-dim">

@@ -14,15 +14,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-[var(--color-accent)] text-ink-950 hover:bg-[var(--color-accent-soft)] " +
-    "shadow-[0_0_0_1px_rgba(228,243,61,0.5),0_18px_40px_-18px_rgba(228,243,61,0.55)] " +
-    "hover:shadow-[0_0_0_1px_rgba(228,243,61,0.7),0_22px_50px_-16px_rgba(228,243,61,0.7)]",
+    "text-white bg-[image:var(--gradient-brand)] " +
+    "shadow-[0_-4px_7px_rgba(50,50,50,0.32)_inset,0_18px_36px_-16px_rgba(67,97,252,0.55)] " +
+    "hover:-translate-y-[1px] hover:shadow-[0_-4px_7px_rgba(50,50,50,0.32)_inset,0_24px_46px_-16px_rgba(67,97,252,0.7)]",
   secondary:
-    "bg-white text-ink-950 hover:bg-ink-100 shadow-[0_0_0_1px_rgba(255,255,255,0.6)]",
+    "bg-white text-[#0f0f0f] hover:bg-[#fafafa] shadow-[0_0_0_1px_rgba(255,255,255,0.6)]",
   ghost:
-    "bg-transparent text-ink-100 hover:bg-white/[0.04] border border-transparent",
+    "bg-transparent text-fg-muted hover:bg-white/[0.04] border border-transparent",
   outline:
-    "bg-transparent text-ink-50 border border-white/10 hover:border-white/25 hover:bg-white/[0.025]",
+    "bg-transparent text-fg border border-white/10 hover:border-white/25 hover:bg-white/[0.025]",
   danger:
     "bg-[var(--color-danger)]/15 text-[var(--color-danger)] border border-[var(--color-danger)]/30 hover:bg-[var(--color-danger)]/20",
 };
