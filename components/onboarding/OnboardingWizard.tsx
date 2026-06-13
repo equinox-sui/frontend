@@ -139,7 +139,12 @@ export function OnboardingWizard() {
     );
   }, [step]);
 
-  const next = () => setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  const next = () => {
+    // Guard the amount step even if Continue is reached programmatically.
+    if (step === 1 && (state.amount < 10 || state.amount > mockUser.suiBalance))
+      return;
+    setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  };
   const prev = () => setStep((s) => Math.max(0, s - 1));
 
   const profile = useMemo(
@@ -150,6 +155,19 @@ export function OnboardingWizard() {
   const borrowed = usdValue * profile.ltv;
   const toUser = borrowed * 0.6;
   const toAgent = borrowed * 0.4;
+
+  // README §3: min 10 SUI, never above wallet balance.
+  const MIN_DEPOSIT = 10;
+  const amountValid =
+    state.amount >= MIN_DEPOSIT && state.amount <= mockUser.suiBalance;
+  const amountError =
+    state.amount > mockUser.suiBalance
+      ? `Exceeds balance · max ${formatSUI(mockUser.suiBalance, 2)} SUI`
+      : state.amount < MIN_DEPOSIT
+        ? `Minimum deposit is ${MIN_DEPOSIT} SUI`
+        : null;
+  // Continue is blocked on the amount step until the deposit is valid.
+  const stepBlocked = step === 1 && !amountValid;
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-10 py-10">
@@ -308,11 +326,17 @@ export function OnboardingWizard() {
                 style={{ accentColor: "#9181f5" }}
               />
               <div
-                className="mt-4 flex items-center justify-between text-[12px] text-fg-dim"
+                className="mt-4 flex items-center justify-between text-[12px]"
                 style={TECH_FONT}
               >
-                <span>≈ {formatUSD(usdValue)}</span>
-                <span>Min · 10 SUI</span>
+                <span className="text-fg-dim">≈ {formatUSD(usdValue)}</span>
+                <span
+                  className={
+                    amountError ? "text-[var(--color-rose)]" : "text-fg-dim"
+                  }
+                >
+                  {amountError ?? "Min · 10 SUI"}
+                </span>
               </div>
             </div>
 
@@ -629,7 +653,9 @@ export function OnboardingWizard() {
                 </SecondaryButton>
                 <PrimaryButton
                   className="flex-[1.4]"
+                  disabled={!amountValid}
                   onClick={() => {
+                    if (!amountValid) return;
                     auth.openPosition();
                     window.location.href = "/dashboard";
                   }}
@@ -701,7 +727,7 @@ export function OnboardingWizard() {
             Step {String(step + 1).padStart(2, "0")} /{" "}
             {String(STEPS.length).padStart(2, "0")}
           </div>
-          <PrimaryButton onClick={next}>
+          <PrimaryButton onClick={next} disabled={stepBlocked}>
             Continue
             <ArrowRight className="size-4" />
           </PrimaryButton>

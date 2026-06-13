@@ -3,22 +3,21 @@
 /**
  * Wallet/auth status pill in the dashboard top bar.
  *
- * Reads the mock auth state from lib/auth.ts so it stays in sync with the
- * Login modal (set on landing) and the onboarding wizard (open position).
+ * Reads the mock auth state from lib/auth.ts and opens the shared zkLogin
+ * LoginModal — the same "no wallet to install" flow as the landing page
+ * (README §2). Sign-in happens only when the user actually picks a provider
+ * inside LoginModal (which calls auth.signIn() + routes), never on dismissal.
  *
- * Today it renders the in-house ConnectWalletModal. Swap to Privy by
- * installing @privy-io/react-auth with pnpm (Privy v3 needs the .pnpm
- * folder layout npm doesn't produce) and replacing the modal with a Privy
- * login() call.
+ * To swap in Privy: install @privy-io/react-auth with pnpm and replace the
+ * LoginModal trigger with a Privy login() call.
  */
 
 import { useState } from "react";
 import { Wallet, LogOut } from "lucide-react";
-import { cn } from "@/lib/cn";
-import { ConnectWalletModal } from "./ConnectWalletModal";
 import { auth } from "@/lib/auth";
 import { useAuth } from "@/lib/useAuth";
 import { mockUser } from "@/data/mock";
+import { LoginModal } from "@/components/modals/LoginModal";
 
 export function ConnectWalletButton() {
   const { signedIn } = useAuth();
@@ -33,14 +32,11 @@ export function ConnectWalletButton() {
           window.location.href = "/";
         }}
         title="Sign out"
-        className={cn(
-          "group inline-flex h-10 items-center gap-2 rounded-full pl-3 pr-4 text-[13px] font-medium transition-all",
-          "border border-[var(--color-positive)]/30 bg-[var(--color-positive)]/8 text-[var(--color-positive)] hover:bg-[var(--color-positive)]/15"
-        )}
+        className="group inline-flex h-10 items-center gap-2 rounded-full border border-[var(--color-emerald)]/30 bg-[var(--color-emerald)]/[0.08] pl-3 pr-4 text-[13px] font-medium text-[var(--color-emerald)] transition-all hover:bg-[var(--color-emerald)]/15"
       >
         <span
           aria-hidden
-          className="grid h-6 w-6 place-items-center rounded-full bg-[var(--color-positive)]/15"
+          className="grid h-6 w-6 place-items-center rounded-full bg-[var(--color-emerald)]/15"
         >
           <Wallet size={12} />
         </span>
@@ -48,7 +44,7 @@ export function ConnectWalletButton() {
         <span className="sm:hidden">Connected</span>
         <LogOut
           size={13}
-          className="ml-1 text-[var(--color-positive)]/60 transition-colors group-hover:text-[var(--color-positive)]"
+          className="ml-1 text-[var(--color-emerald)]/60 transition-colors group-hover:text-[var(--color-emerald)]"
         />
       </button>
     );
@@ -59,7 +55,7 @@ export function ConnectWalletButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group inline-flex h-10 items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] pl-3 pr-4 text-[13px] font-medium text-ink-50 transition-all hover:border-white/20 hover:bg-white/[0.05]"
+        className="group inline-flex h-10 items-center gap-2 rounded-full border border-border-strong/80 bg-surface-2/40 pl-3 pr-4 text-[13px] font-medium text-fg transition-all hover:border-white/25 hover:bg-white/[0.06]"
       >
         <span
           aria-hidden
@@ -69,14 +65,7 @@ export function ConnectWalletButton() {
         </span>
         Connect Wallet
       </button>
-      <ConnectWalletModal
-        open={open}
-        onClose={() => {
-          setOpen(false);
-          // Picking any provider in the in-house modal counts as a sign-in.
-          auth.signIn();
-        }}
-      />
+      <LoginModal open={open} onClose={() => setOpen(false)} />
     </>
   );
 }

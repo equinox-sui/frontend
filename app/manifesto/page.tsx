@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Badge } from "@/components/ui/Badge";
@@ -77,13 +76,15 @@ export default function ManifestoPage() {
               <span className="tab-nums">wal://1f0e9b…cda</span>
             </div>
           </div>
-          <Link
-            href="#"
+          <a
+            href={mockPosition.manifestoBlobUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-5 inline-flex items-center gap-2 text-[13px] text-[var(--color-accent)] hover:underline underline-offset-4"
           >
             View raw file
             <ArrowUpRight size={14} />
-          </Link>
+          </a>
         </article>
       </div>
     </AppShell>

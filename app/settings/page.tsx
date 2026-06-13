@@ -7,6 +7,12 @@ import { Toggle } from "@/components/ui/Toggle";
 import { Button } from "@/components/ui/Button";
 import { mockUser } from "@/data/mock";
 import { shortAddress } from "@/lib/format";
+import { auth } from "@/lib/auth";
+
+function logOut() {
+  auth.signOut();
+  window.location.href = "/";
+}
 
 const NOTIFY = [
   { key: "defense", label: "Defense alerts", hint: "When HF crosses your threshold.", def: true },
@@ -134,11 +140,31 @@ export default function SettingsPage() {
               k="Close all positions"
               hint="Unwinds everything and returns collateral. Spread captured stays in your Shadow wallet."
               cta="Close all"
+              onAction={() => {
+                if (
+                  window.confirm(
+                    "Close all positions? Collateral is returned and the agent stops.",
+                  )
+                ) {
+                  auth.closePosition();
+                  window.location.href = "/dashboard";
+                }
+              }}
             />
             <DangerRow
               k="Delete account"
               hint="Removes your profile from Equinox. You'll need to re-onboard to use the agent again."
               cta="Delete"
+              onAction={() => {
+                if (
+                  window.confirm(
+                    "Delete your account? This removes your profile and signs you out.",
+                  )
+                ) {
+                  auth.signOut();
+                  window.location.href = "/";
+                }
+              }}
             />
           </div>
         </section>
@@ -147,7 +173,7 @@ export default function SettingsPage() {
           <span className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-ink-500">
             v0.1.0 · build a7c4d2
           </span>
-          <Button variant="outline" size="sm" className="!h-9">
+          <Button variant="outline" size="sm" className="!h-9" onClick={logOut}>
             <LogOut size={13} />
             Log out
           </Button>
@@ -230,10 +256,12 @@ function DangerRow({
   k,
   hint,
   cta,
+  onAction,
 }: {
   k: string;
   hint: string;
   cta: string;
+  onAction?: () => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-4">
@@ -241,7 +269,10 @@ function DangerRow({
         <div className="text-[13.5px] text-ink-100">{k}</div>
         <div className="mt-1 text-[11.5px] text-ink-400 max-w-md">{hint}</div>
       </div>
-      <button className="rounded-full border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 px-3.5 py-2 text-[12.5px] text-[var(--color-danger)] hover:bg-[var(--color-danger)]/20">
+      <button
+        onClick={onAction}
+        className="rounded-full border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 px-3.5 py-2 text-[12.5px] text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger)]/20"
+      >
         {cta}
       </button>
     </div>

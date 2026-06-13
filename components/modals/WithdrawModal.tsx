@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDownToLine, Check } from "lucide-react";
 import { Modal } from "./Modal";
 import { Button } from "@/components/ui/Button";
@@ -16,9 +16,24 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
   const [amount, setAmount] = useState("");
   const [stage, setStage] = useState<"input" | "signing" | "success">("input");
   const max = mockPosition.shadowBalanceUsdc;
+  const signTimer = useRef<number | null>(null);
+  const resetTimer = useRef<number | null>(null);
 
   const numeric = Number(amount) || 0;
   const valid = numeric > 0 && numeric <= max;
+
+  const clearTimers = () => {
+    if (signTimer.current) window.clearTimeout(signTimer.current);
+    if (resetTimer.current) window.clearTimeout(resetTimer.current);
+    signTimer.current = resetTimer.current = null;
+  };
+
+  // Cancel any in-flight "signing" timer if the modal is dismissed before it
+  // resolves, so reopening never lands on a stale success screen.
+  useEffect(() => {
+    if (!open) clearTimers();
+  }, [open]);
+  useEffect(() => () => clearTimers(), []);
 
   const reset = () => {
     setAmount("");
@@ -26,15 +41,17 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
   };
 
   const close = () => {
+    clearTimers();
     onClose();
-    setTimeout(reset, 250);
+    resetTimer.current = window.setTimeout(reset, 250);
   };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!valid) return;
+    clearTimers();
     setStage("signing");
-    setTimeout(() => setStage("success"), 1400);
+    signTimer.current = window.setTimeout(() => setStage("success"), 1400);
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check } from "lucide-react";
 import { Modal } from "./Modal";
 import { Button } from "@/components/ui/Button";
@@ -23,23 +23,44 @@ const STEPS = [
 export function ClosePositionModal({ open, onClose }: ClosePositionModalProps) {
   const [stage, setStage] = useState<"preview" | "executing" | "done">("preview");
   const [stepIdx, setStepIdx] = useState(0);
+  const intervalRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const resetRef = useRef<number | null>(null);
+
+  const clearTimers = () => {
+    if (intervalRef.current) window.clearInterval(intervalRef.current);
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    if (resetRef.current) window.clearTimeout(resetRef.current);
+    intervalRef.current = timeoutRef.current = resetRef.current = null;
+  };
+
+  // Belt-and-braces: any path that hides the modal (Escape/backdrop/X all
+  // route through onClose → close, but guard the prop flip too) kills the
+  // executing animation so a hidden modal never marches itself to "done".
+  useEffect(() => {
+    if (!open) clearTimers();
+  }, [open]);
+  useEffect(() => () => clearTimers(), []);
 
   const close = () => {
+    clearTimers();
     onClose();
-    setTimeout(() => {
+    resetRef.current = window.setTimeout(() => {
       setStage("preview");
       setStepIdx(0);
     }, 250);
   };
 
   const confirm = () => {
+    clearTimers();
     setStage("executing");
     setStepIdx(0);
-    const interval = window.setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
       setStepIdx((idx) => {
         if (idx >= STEPS.length - 1) {
-          window.clearInterval(interval);
-          window.setTimeout(() => setStage("done"), 600);
+          if (intervalRef.current) window.clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          timeoutRef.current = window.setTimeout(() => setStage("done"), 600);
           return idx + 1;
         }
         return idx + 1;
