@@ -20,8 +20,26 @@ import { mockUser } from "@/data/mock";
 import { LoginModal } from "@/components/modals/LoginModal";
 
 export function ConnectWalletButton() {
-  const { signedIn } = useAuth();
+  const { signedIn, ready } = useAuth();
   const [open, setOpen] = useState(false);
+
+  // Avoid flashing "Connect Wallet" for a signed-in user before localStorage
+  // is read — show a neutral placeholder pill until auth state resolves.
+  if (!ready) {
+    return (
+      <span
+        aria-hidden
+        className="inline-flex h-10 w-[150px] items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/40 pl-3 pr-4"
+      >
+        <span className="relative h-6 w-6 overflow-hidden rounded-full bg-white/[0.06]">
+          <span className="absolute inset-0 shimmer" />
+        </span>
+        <span className="relative h-3 flex-1 overflow-hidden rounded bg-white/[0.06]">
+          <span className="absolute inset-0 shimmer" />
+        </span>
+      </span>
+    );
+  }
 
   if (signedIn) {
     return (
