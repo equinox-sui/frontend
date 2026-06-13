@@ -2,33 +2,15 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Plus } from "lucide-react";
+import { ArrowUpRight, Plus, ShieldCheck, FileCheck2 } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap } from "@/lib/gsap";
 import { HalftoneField } from "../visuals/halftone-field";
 import { StackMarquee } from "./stack-marquee";
 
-type Card = {
-  title: string;
-  href: string;
-  external?: boolean;
-  brand: "equinox-core" | "walrus";
+const TECH: React.CSSProperties = {
+  fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
 };
-
-const CARDS: Card[] = [
-  {
-    title: "Audit-ready",
-    href: "https://github.com/EzraNahumury",
-    external: true,
-    brand: "equinox-core",
-  },
-  {
-    title: "Manifesto on Walrus",
-    href: "https://docs.sui.io/",
-    external: true,
-    brand: "walrus",
-  },
-];
 
 export function SecurityIntegrations() {
   const ref = useRef<HTMLElement>(null);
@@ -156,73 +138,38 @@ export function SecurityIntegrations() {
           </div>
         </div>
 
-        {/* Cards */}
-        <div className="si-cards mt-24 flex flex-wrap items-center justify-center gap-5 sm:gap-6">
-          {CARDS.map((c) => (
-            <Link
-              key={c.title}
-              href={c.href}
-              {...(c.external ? { target: "_blank", rel: "noreferrer" } : {})}
-              className="si-card group relative flex h-[270px] w-[238px] flex-col rounded-[20px] bg-white text-bg shadow-[0_24px_50px_-22px_rgba(0,0,0,0.55)] transition-transform duration-500 hover:-translate-y-1.5"
-            >
-              <div className="px-5 pt-5">
-                <h3
-                  className="text-[15px] font-semibold tracking-tight text-bg"
-                  style={{
-                    fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
-                  }}
-                >
-                  {c.title}
-                </h3>
-              </div>
-
-              {/* Logo plate */}
-              <div className="relative mx-5 mt-3 flex flex-1 items-center justify-center overflow-hidden rounded-[12px] bg-gradient-to-br from-[#f5f6fa] to-[#e6e9f1]">
-                <BrandChip kind={c.brand} />
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(rgba(15,15,15,0.06) 1px, transparent 1px)",
-                    backgroundSize: "6px 6px",
-                    maskImage:
-                      "radial-gradient(ellipse at center, transparent 55%, black 90%)",
-                    WebkitMaskImage:
-                      "radial-gradient(ellipse at center, transparent 55%, black 90%)",
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between px-5 pb-4 pt-4">
-                <span
-                  className="text-[14px] font-medium text-bg"
-                  style={{
-                    fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
-                  }}
-                >
-                  See Report
-                </span>
-                <span
-                  aria-hidden
-                  className="relative grid size-9 place-items-center overflow-hidden rounded-full text-white"
-                >
-                  <span
-                    className="absolute inset-0 rounded-full"
-                    style={{ background: "var(--gradient-brand)" }}
-                  />
-                  <span
-                    className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                    style={{
-                      background:
-                        "linear-gradient(0deg, rgba(255,255,255,0.35), rgba(255,255,255,0.35)), var(--gradient-brand)",
-                    }}
-                  />
-                  <ArrowUpRight className="relative size-3.5 transition-transform duration-300 group-hover:translate-x-[1px] group-hover:-translate-y-[1px]" />
-                </span>
-              </div>
-            </Link>
-          ))}
+        {/* Trust panels — full-width dark glass, asymmetric 1.2/1 split */}
+        <div className="si-cards mt-20 grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+          {/* Audit panel */}
+          <TrustPanel
+            icon={ShieldCheck}
+            eyebrow="Smart-contract audit"
+            title="Audit-ready Move contracts"
+            statusLabel="Pre-mainnet"
+            statusTone="#ffc46b"
+            href="https://github.com/EzraNahumury"
+            cta="View on GitHub"
+            rows={[
+              { k: "Auditor", v: "OtterSec" },
+              { k: "Scope", v: "Position · Adapters · Defense" },
+              { k: "Critical findings", v: "0", tone: "#6cf2cc" },
+            ]}
+          />
+          {/* Walrus panel */}
+          <TrustPanel
+            icon={FileCheck2}
+            eyebrow="Manifesto on Walrus"
+            title="Pinned & immutable"
+            statusLabel="Verified"
+            statusTone="#6cf2cc"
+            href="https://docs.sui.io/"
+            cta="View on Walrus"
+            rows={[
+              { k: "Blob", v: "wal://1f0e9b…cda", mono: true },
+              { k: "Hash", v: "0xabc123…c5d", mono: true },
+              { k: "Mutable?", v: "No — sealed", tone: "#6cf2cc" },
+            ]}
+          />
         </div>
       </div>
 
@@ -246,46 +193,107 @@ export function SecurityIntegrations() {
   );
 }
 
-function BrandChip({ kind }: { kind: "equinox-core" | "walrus" }) {
-  if (kind === "equinox-core") {
-    return (
+function TrustPanel({
+  icon: Icon,
+  eyebrow,
+  title,
+  statusLabel,
+  statusTone,
+  href,
+  cta,
+  rows,
+}: {
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  eyebrow: string;
+  title: string;
+  statusLabel: string;
+  statusTone: string;
+  href: string;
+  cta: string;
+  rows: { k: string; v: string; mono?: boolean; tone?: string }[];
+}) {
+  return (
+    <Link
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="si-card group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-border-strong/60 bg-surface/45 p-7 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 hover:border-border-strong sm:p-8"
+    >
       <div
-        className="relative z-10 inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_8px_22px_-12px_rgba(15,15,15,0.35)]"
-        style={{
-          fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
-        }}
-      >
+        aria-hidden
+        className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full opacity-50 blur-3xl transition-opacity duration-500 group-hover:opacity-80"
+        style={{ background: `${statusTone}26` }}
+      />
+      <div className="relative flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <span
+            className="grid h-10 w-10 place-items-center rounded-xl border"
+            style={{
+              borderColor: `${statusTone}44`,
+              background: `${statusTone}12`,
+              color: statusTone,
+            }}
+          >
+            <Icon className="size-[18px]" strokeWidth={1.8} />
+          </span>
+          <span
+            className="text-[10.5px] uppercase tracking-[0.18em] text-fg-dim"
+            style={TECH}
+          >
+            {eyebrow}
+          </span>
+        </div>
         <span
-          aria-hidden
-          className="grid size-6 place-items-center rounded-md text-[#0a0a0a]"
+          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] uppercase tracking-[0.14em]"
+          style={{
+            color: statusTone,
+            background: `${statusTone}14`,
+            boxShadow: `0 0 0 1px ${statusTone}40`,
+          }}
         >
-          <svg viewBox="0 0 24 24" className="size-4" fill="none" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="8 5 3 12 8 19" />
-            <polyline points="16 5 21 12 16 19" />
-          </svg>
-        </span>
-        <span className="text-[14px] font-semibold tracking-tight text-[#0a0a0a]">
-          Equinox <span className="font-medium text-[#0a0a0a]/65">Core</span>
+          <span
+            className="h-1.5 w-1.5 rounded-full animate-pulse-soft"
+            style={{ background: statusTone, boxShadow: `0 0 6px ${statusTone}` }}
+          />
+          {statusLabel}
         </span>
       </div>
-    );
-  }
 
-  return (
-    <div
-      className="relative z-10 inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2 shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_8px_22px_-12px_rgba(15,15,15,0.35)]"
-      style={{
-        fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
-      }}
-    >
-      <span aria-hidden className="grid size-6 place-items-center text-[#0a0a0a]">
-        <svg viewBox="0 0 24 24" className="size-4" fill="none" strokeWidth="2" stroke="currentColor" strokeLinejoin="round">
-          <path d="M12 2 3 7v10l9 5 9-5V7z" />
-        </svg>
-      </span>
-      <span className="text-[14px] font-semibold tracking-tight text-[#0a0a0a]">
-        Walrus <span className="font-medium text-[#0a0a0a]/65">pinned</span>
-      </span>
-    </div>
+      <h3
+        className="relative mt-6 text-[22px] font-semibold tracking-tight text-fg sm:text-[24px]"
+        style={TECH}
+      >
+        {title}
+      </h3>
+
+      <dl className="relative mt-6 divide-y divide-border/70 border-y border-border/70">
+        {rows.map((r) => (
+          <div key={r.k} className="flex items-center justify-between py-3">
+            <dt className="text-[12.5px] text-fg-dim" style={TECH}>
+              {r.k}
+            </dt>
+            <dd
+              className={`text-[13px] ${r.mono ? "font-mono tabular-nums" : ""}`}
+              style={{ color: r.tone ?? "var(--color-fg)", ...TECH }}
+            >
+              {r.v}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="relative mt-auto flex items-center justify-between pt-6">
+        <span className="text-[14px] font-medium text-fg" style={TECH}>
+          {cta}
+        </span>
+        <span
+          aria-hidden
+          className="grid size-9 place-items-center rounded-full text-white"
+          style={{ background: "var(--gradient-brand)" }}
+        >
+          <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-[1px] group-hover:-translate-y-[1px]" />
+        </span>
+      </div>
+    </Link>
   );
 }
