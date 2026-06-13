@@ -2,36 +2,23 @@
 
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import {
-  Hexagon,
-  PenLine,
-  Boxes,
-  Fuel,
-  BrainCircuit,
-  Database,
-  Workflow,
-  Layers,
-  Wand2,
-  Waves,
-} from "lucide-react";
 import { gsap, registerGsap } from "@/lib/gsap";
 
 type Item = {
   label: string;
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  /** Real brand logo stored under /public/logos. */
+  src: string;
 };
 
 const ITEMS: Item[] = [
-  { label: "Sui", icon: Hexagon },
-  { label: "Move", icon: PenLine },
-  { label: "Suilend", icon: Boxes },
-  { label: "Scallop", icon: Fuel },
-  { label: "Cetus", icon: BrainCircuit },
-  { label: "Walrus", icon: Database },
-  { label: "zkLogin", icon: Workflow },
-  { label: "Next.js 16", icon: Layers },
-  { label: "Pyth", icon: Wand2 },
-  { label: "Mysten SDK", icon: Waves },
+  { label: "Sui", src: "/logos/sui.png" },
+  { label: "Suilend", src: "/logos/suilend.png" },
+  { label: "Scallop", src: "/logos/scallop.png" },
+  { label: "Cetus", src: "/logos/cetus.png" },
+  { label: "Walrus", src: "/logos/walrus.png" },
+  { label: "Pyth", src: "/logos/pyth.png" },
+  { label: "zkLogin", src: "/logos/mysten.png" },
+  { label: "Next.js 16", src: "/logos/nextjs.png" },
 ];
 
 type Props = {
@@ -197,7 +184,7 @@ export function StackMarquee({ variant = "default" }: Props) {
   );
 }
 
-function Pill({ label, icon: Icon }: Item) {
+function Pill({ label, src }: Item) {
   return (
     <div
       className="group flex h-[78px] shrink-0 items-center gap-4 rounded-full bg-[#131512] px-10 transition-colors duration-300 hover:bg-[#1a1c1a] sm:gap-5 sm:px-12"
@@ -205,11 +192,20 @@ function Pill({ label, icon: Icon }: Item) {
         boxShadow: "0 1px 0 rgba(255, 255, 255, 0.04) inset",
       }}
     >
+      {/* White chip keeps every logo legible on the dark pill, whether the
+          favicon is dark-on-transparent (Walrus) or a full-bleed mark (Sui). */}
       <span
         aria-hidden
-        className="grid size-9 place-items-center text-fg/90 sm:size-10"
+        className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-white ring-1 ring-black/5 sm:size-10"
       >
-        <Icon className="size-6 sm:size-7" strokeWidth={1.6} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="size-full object-contain"
+        />
       </span>
       <span
         className="text-[20px] font-medium tracking-tight text-fg sm:text-[22px]"
