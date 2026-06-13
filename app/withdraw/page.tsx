@@ -15,13 +15,13 @@ export default function WithdrawPage() {
     <AppShell>
       <div className="mx-auto w-full max-w-[640px] space-y-8">
         <div>
-          <span className="text-[11px] uppercase tracking-[0.16em] text-ink-400">
+          <span className="text-[11px] uppercase tracking-[0.16em] text-fg-dim">
             Shadow wallet
           </span>
-          <h1 className="mt-2 text-[28px] font-medium tracking-[-0.015em] text-ink-50">
+          <h1 className="mt-2 text-[28px] font-medium tracking-[-0.015em] text-fg">
             Pull profit to your wallet.
           </h1>
-          <p className="mt-2 text-[13.5px] text-ink-300">
+          <p className="mt-2 text-[13.5px] text-fg-muted">
             Shadow holds USDC that built up from collateral appreciation and
             spread overflow. Withdraw any amount, any time. No fees from us.
           </p>
@@ -32,13 +32,13 @@ export default function WithdrawPage() {
             aria-hidden
             className="pointer-events-none absolute -top-12 right-0 h-44 w-44 rounded-full bg-[var(--color-accent)]/14 blur-2xl"
           />
-          <span className="text-[11px] uppercase tracking-[0.16em] text-ink-400">
+          <span className="text-[11px] uppercase tracking-[0.16em] text-fg-dim">
             Available
           </span>
           <div className="mt-3 text-[44px] font-medium leading-none tracking-tight text-[var(--color-accent)] tab-nums">
             {formatUSD(mockPosition.shadowBalanceUsdc)}
           </div>
-          <div className="mt-1 text-[12.5px] text-ink-400">USDC · spendable</div>
+          <div className="mt-1 text-[12.5px] text-fg-dim">USDC · spendable</div>
 
           <div className="mt-7 grid grid-cols-2 gap-3 border-t border-white/[0.04] pt-5 text-[12.5px]">
             <Mini k="Network fee" v="~$0.01" />
@@ -52,7 +52,7 @@ export default function WithdrawPage() {
             </Button>
             <Link
               href="/dashboard"
-              className="inline-flex items-center justify-center rounded-full border border-white/10 px-5 py-3 text-[13px] text-ink-100 hover:bg-white/[0.04]"
+              className="inline-flex items-center justify-center rounded-full border border-white/10 px-5 py-3 text-[13px] text-fg hover:bg-white/[0.04]"
             >
               Back to dashboard
             </Link>
@@ -68,12 +68,12 @@ export default function WithdrawPage() {
 function Mini({ k, v, accent }: { k: string; v: string; accent?: boolean }) {
   return (
     <div className="rounded-2xl border border-white/[0.05] bg-white/[0.015] p-4">
-      <div className="text-[10.5px] uppercase tracking-[0.14em] text-ink-400">
+      <div className="text-[10.5px] uppercase tracking-[0.14em] text-fg-dim">
         {k}
       </div>
       <div
         className={`mt-1.5 font-mono text-[15px] tab-nums ${
-          accent ? "text-[var(--color-accent)]" : "text-ink-50"
+          accent ? "text-[var(--color-accent)]" : "text-fg"
         }`}
       >
         {v}

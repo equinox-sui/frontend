@@ -127,25 +127,51 @@ export function OnboardingWizard() {
   });
 
   const panelRef = useRef<HTMLDivElement | null>(null);
+  // +1 when moving forward, -1 when going back — drives the slide direction.
+  const dirRef = useRef(1);
 
   useEffect(() => {
     const el = panelRef.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    gsap.fromTo(
+    const dir = dirRef.current;
+    const tl = gsap.timeline();
+    // Whole panel slides in from the travel direction…
+    tl.fromTo(
       el,
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 0.55, ease: "expo.out" }
+      { opacity: 0, x: dir * 28 },
+      { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }
     );
+    // …then the step's option cards stagger up so each step feels composed.
+    const root = el.firstElementChild;
+    const items = root ? Array.from(root.children) : [];
+    if (items.length) {
+      tl.fromTo(
+        items,
+        { opacity: 0, y: 16 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.06,
+          duration: 0.45,
+          ease: "expo.out",
+        },
+        "-=0.22"
+      );
+    }
   }, [step]);
 
   const next = () => {
     // Guard the amount step even if Continue is reached programmatically.
     if (step === 1 && (state.amount < 10 || state.amount > mockUser.suiBalance))
       return;
+    dirRef.current = 1;
     setStep((s) => Math.min(STEPS.length - 1, s + 1));
   };
-  const prev = () => setStep((s) => Math.max(0, s - 1));
+  const prev = () => {
+    dirRef.current = -1;
+    setStep((s) => Math.max(0, s - 1));
+  };
 
   const profile = useMemo(
     () => riskProfiles.find((p) => p.id === state.risk)!,

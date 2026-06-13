@@ -38,10 +38,10 @@ export default function SettingsPage() {
     <AppShell>
       <div className="mx-auto w-full max-w-[820px] space-y-8">
         <header>
-          <h1 className="text-[28px] font-medium tracking-[-0.015em] text-ink-50">
+          <h1 className="text-[28px] font-medium tracking-[-0.015em] text-fg">
             Settings
           </h1>
-          <p className="mt-1 text-[13px] text-ink-400">
+          <p className="mt-1 text-[13px] text-fg-dim">
             Personal preferences. Only you can see these.
           </p>
         </header>
@@ -50,14 +50,14 @@ export default function SettingsPage() {
           <Row k="Email" v={mockUser.email} hint="From your zkLogin provider" />
           <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4 last:border-0">
             <div className="min-w-0">
-              <div className="text-[13.5px] text-ink-100">Sui address</div>
-              <div className="mt-1 font-mono text-[11.5px] text-ink-400">
+              <div className="text-[13.5px] text-fg">Sui address</div>
+              <div className="mt-1 font-mono text-[11.5px] text-fg-dim">
                 {shortAddress(mockUser.suiAddress, 10, 8)}
               </div>
             </div>
             <button
               onClick={copy}
-              className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 text-[12px] text-ink-100 hover:bg-white/[0.05]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 text-[12px] text-fg hover:bg-white/[0.05]"
             >
               {copied ? <Check size={13} /> : <Copy size={13} />}
               {copied ? "Copied" : "Copy"}
@@ -76,8 +76,8 @@ export default function SettingsPage() {
               className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4 last:border-0"
             >
               <div>
-                <div className="text-[13.5px] text-ink-100">{n.label}</div>
-                <div className="mt-1 text-[11.5px] text-ink-400">{n.hint}</div>
+                <div className="text-[13.5px] text-fg">{n.label}</div>
+                <div className="mt-1 text-[11.5px] text-fg-dim">{n.hint}</div>
               </div>
               <Toggle defaultOn={n.def} label={n.label} />
             </div>
@@ -87,8 +87,8 @@ export default function SettingsPage() {
         <Section title="Display" intro="Visual & locale.">
           <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4">
             <div>
-              <div className="text-[13.5px] text-ink-100">Currency</div>
-              <div className="mt-1 text-[11.5px] text-ink-400">
+              <div className="text-[13.5px] text-fg">Currency</div>
+              <div className="mt-1 text-[11.5px] text-fg-dim">
                 Used across cards, modals, and exports.
               </div>
             </div>
@@ -96,8 +96,8 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4">
             <div>
-              <div className="text-[13.5px] text-ink-100">Theme</div>
-              <div className="mt-1 text-[11.5px] text-ink-400">
+              <div className="text-[13.5px] text-fg">Theme</div>
+              <div className="mt-1 text-[11.5px] text-fg-dim">
                 Light mode is coming soon. Currently Dark only.
               </div>
             </div>
@@ -114,8 +114,8 @@ export default function SettingsPage() {
         <Section title="Advanced" intro="Power-user options.">
           <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4 last:border-0 opacity-60">
             <div>
-              <div className="text-[13.5px] text-ink-100">Pro Mode</div>
-              <div className="mt-1 text-[11.5px] text-ink-400">
+              <div className="text-[13.5px] text-fg">Pro Mode</div>
+              <div className="mt-1 text-[11.5px] text-fg-dim">
                 Manual rebalance, custom routing, deeper analytics. Coming soon.
               </div>
             </div>
@@ -127,11 +127,11 @@ export default function SettingsPage() {
           <div className="border-b border-[var(--color-danger)]/20 px-5 py-4">
             <div className="flex items-center gap-2">
               <AlertTriangle size={15} className="text-[var(--color-danger)]" />
-              <h2 className="text-[14px] font-medium text-ink-50">
+              <h2 className="text-[14px] font-medium text-fg">
                 Danger zone
               </h2>
             </div>
-            <p className="mt-1 text-[12.5px] text-ink-400">
+            <p className="mt-1 text-[12.5px] text-fg-dim">
               Irreversible. Make sure you understand the consequences.
             </p>
           </div>
@@ -170,7 +170,7 @@ export default function SettingsPage() {
         </section>
 
         <div className="flex items-center justify-between border-t border-white/[0.05] pt-6">
-          <span className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-ink-500">
+          <span className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-fg-dim">
             v0.1.0 · build a7c4d2
           </span>
           <Button variant="outline" size="sm" className="!h-9" onClick={logOut}>
@@ -195,10 +195,10 @@ function Section({
   return (
     <section>
       <div className="mb-4">
-        <h2 className="text-[16px] font-medium tracking-[-0.005em] text-ink-50">
+        <h2 className="text-[16px] font-medium tracking-[-0.005em] text-fg">
           {title}
         </h2>
-        <p className="mt-0.5 text-[12.5px] text-ink-400">{intro}</p>
+        <p className="mt-0.5 text-[12.5px] text-fg-dim">{intro}</p>
       </div>
       <div className="overflow-hidden rounded-3xl border border-white/[0.06] bg-[var(--bg-card)]/55">
         {children}
@@ -211,10 +211,10 @@ function Row({ k, v, hint }: { k: string; v: string; hint?: string }) {
   return (
     <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4 last:border-0">
       <div>
-        <div className="text-[13.5px] text-ink-100">{k}</div>
-        {hint && <div className="mt-1 text-[11.5px] text-ink-400">{hint}</div>}
+        <div className="text-[13.5px] text-fg">{k}</div>
+        {hint && <div className="mt-1 text-[11.5px] text-fg-dim">{hint}</div>}
       </div>
-      <span className="text-[13px] text-ink-300">{v}</span>
+      <span className="text-[13px] text-fg-muted">{v}</span>
     </div>
   );
 }
@@ -241,7 +241,7 @@ function Pills({
             disabled={isDisabled}
             onClick={() => onChange(opt)}
             className={`rounded-full px-3 py-1.5 text-[12px] transition-colors ${
-              active ? "bg-white/[0.06] text-ink-50" : "text-ink-300 hover:text-ink-100"
+              active ? "bg-white/[0.06] text-fg" : "text-fg-muted hover:text-fg"
             } ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
           >
             {opt}
@@ -266,8 +266,8 @@ function DangerRow({
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-4">
       <div>
-        <div className="text-[13.5px] text-ink-100">{k}</div>
-        <div className="mt-1 text-[11.5px] text-ink-400 max-w-md">{hint}</div>
+        <div className="text-[13.5px] text-fg">{k}</div>
+        <div className="mt-1 text-[11.5px] text-fg-dim max-w-md">{hint}</div>
       </div>
       <button
         onClick={onAction}
