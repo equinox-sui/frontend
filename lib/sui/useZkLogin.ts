@@ -29,16 +29,31 @@ import { isZkLoginConfigured } from "@/lib/sui/config";
 import { setEmailHint, clearEmailHint } from "@/lib/sui/email-hint";
 import { emailFromJwt } from "@/lib/sui/jwt";
 
+/** A wallet-standard wallet as surfaced by dapp-kit's useWallets(). */
+export type ConnectableWallet = ReturnType<typeof useWallets>[number];
+
 export function useZkLogin() {
   const account = useCurrentAccount();
   const { mutateAsync: connect, isPending } = useConnectWallet();
   const { mutateAsync: disconnectAsync } = useDisconnectWallet();
 
-  const enokiWallets = useWallets().filter(isEnokiWallet);
+  const wallets = useWallets();
+  const enokiWallets = wallets.filter(isEnokiWallet);
+  // Everything that isn't an Enoki zkLogin wallet is an installed browser
+  // wallet extension (Slush, Suiet, Phantom, …) registered via wallet-standard.
+  const externalWallets = wallets.filter((w) => !isEnokiWallet(w));
+
   const byProvider = new Map<AuthProvider, EnokiWallet>();
   for (const wallet of enokiWallets) byProvider.set(wallet.provider, wallet);
 
   const googleWallet = byProvider.get("google");
+
+  // Returns the connect result so callers can verify a Sui account was actually
+  // authorized — wallets (esp. multichain like Phantom) can connect with zero
+  // Sui-chain accounts, in which case dapp-kit resolves with accounts: [].
+  async function connectWallet(wallet: ConnectableWallet) {
+    return connect({ wallet });
+  }
 
   async function signInWithGoogle(emailHint?: string): Promise<void> {
     if (!googleWallet) {
@@ -72,29 +87,36 @@ export function useZkLogin() {
     isConnected: Boolean(account),
     configured: isZkLoginConfigured(),
     googleAvailable: Boolean(googleWallet),
+    externalWallets,
+    connectWallet,
     connecting: isPending,
     signInWithGoogle,
     disconnect,
   };
 }
 
-export type ZkLoginSessionInfo = {
-  /** Real self-custodial Sui address, or null when not connected via zkLogin. */
+export type AccountSessionInfo = {
+  /** Real Sui address, or null when nothing is connected. */
   address: string | null;
-  /** Email claim from the OIDC JWT (Google), or null. */
+  /** Email claim from the OIDC JWT — only for zkLogin connections. */
   email: string | null;
-  /** Session expiry as an epoch-ms timestamp, or null. */
+  /** zkLogin session expiry as an epoch-ms timestamp, or null. */
   expiresAt: number | null;
-  /** True only when the live connection is an Enoki zkLogin wallet. */
+  /** How the account is connected. */
+  kind: "zklogin" | "wallet" | null;
+  /** Display name of the connected wallet (e.g. "Slush"), or null. */
+  walletName: string | null;
+  /** Convenience flag — true only for an Enoki zkLogin connection. */
   isZkLogin: boolean;
 };
 
 /**
- * Reads the live Enoki session for the Account / Settings UI: the real Sui
- * address, the email from the OIDC JWT, and the session expiry. Falls back to
- * all-null when there is no zkLogin wallet connected (callers then use mock).
+ * Reads the live connection for the Account / Settings UI: the real Sui address
+ * plus, for zkLogin, the email from the OIDC JWT and session expiry. For an
+ * external wallet (Slush, Suiet, …) only the address + wallet name are known.
+ * Falls back to all-null when nothing is connected (callers then use mock).
  */
-export function useZkLoginSession(): ZkLoginSessionInfo {
+export function useZkLoginSession(): AccountSessionInfo {
   const account = useCurrentAccount();
   const { currentWallet } = useCurrentWallet();
   const [email, setEmail] = useState<string | null>(null);
@@ -103,6 +125,11 @@ export function useZkLoginSession(): ZkLoginSessionInfo {
   const isZkLogin = Boolean(
     account && currentWallet && isEnokiWallet(currentWallet),
   );
+  const kind: AccountSessionInfo["kind"] = !account
+    ? null
+    : isZkLogin
+      ? "zklogin"
+      : "wallet";
 
   useEffect(() => {
     let cancelled = false;
@@ -132,6 +159,8 @@ export function useZkLoginSession(): ZkLoginSessionInfo {
     address: account?.address ?? null,
     email,
     expiresAt,
+    kind,
+    walletName: account ? currentWallet?.name ?? null : null,
     isZkLogin,
   };
 }

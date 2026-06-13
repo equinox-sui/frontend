@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Mail, ShieldCheck, Loader2 } from "lucide-react";
+import { ArrowRight, Mail, ShieldCheck, Loader2, Wallet as WalletIcon } from "lucide-react";
 import { Modal } from "./Modal";
 import { Button } from "@/components/ui/Button";
 import { auth } from "@/lib/auth";
@@ -40,10 +40,17 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
-type Busy = null | "google" | "email";
+// "google" | "email" | `wallet:${walletName}`
+type Busy = string | null;
 
 export function LoginModal({ open, onClose }: LoginModalProps) {
-  const { configured, googleAvailable, signInWithGoogle } = useZkLogin();
+  const {
+    configured,
+    googleAvailable,
+    signInWithGoogle,
+    externalWallets,
+    connectWallet,
+  } = useZkLogin();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState<Busy>(null);
   const [error, setError] = useState<string | null>(null);
@@ -100,6 +107,30 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
       // zkLogin has no email issuer — we route the typed address through Google
       // as a login_hint, so this is a real zkLogin sign-in via Google.
       await signInWithGoogle(email.trim());
+      finishSignIn();
+    } catch (err) {
+      setError(messageFor(err));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  // Connect an installed browser wallet (Slush, Suiet, …) via wallet-standard.
+  // Independent of Enoki config — works even when zkLogin is not set up.
+  const handleWallet = async (wallet: (typeof externalWallets)[number]) => {
+    setError(null);
+    setBusy(`wallet:${wallet.name}`);
+    try {
+      const result = await connectWallet(wallet);
+      // A wallet can authorize with no Sui-chain account (multichain wallets
+      // default to ETH/SOL, or the user deselected Sui). dapp-kit resolves
+      // successfully with accounts: [] in that case — don't sign in over it.
+      if (!result?.accounts?.length) {
+        setError(
+          `No Sui account was authorized in ${wallet.name}. Enable a Sui account in your wallet and try again.`,
+        );
+        return;
+      }
       finishSignIn();
     } catch (err) {
       setError(messageFor(err));
@@ -189,6 +220,58 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
               )}
             </Button>
           </form>
+
+          {/* Wallet connect — Slush, Suiet, Phantom, … via wallet-standard */}
+          <div className="my-2 flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-ink-400">
+            <span className="h-px flex-1 bg-white/[0.06]" />
+            or connect a wallet
+            <span className="h-px flex-1 bg-white/[0.06]" />
+          </div>
+
+          {externalWallets.length > 0 ? (
+            <div className="space-y-2.5">
+              {externalWallets.map((w) => (
+                <button
+                  key={w.name}
+                  type="button"
+                  onClick={() => handleWallet(w)}
+                  disabled={busy !== null}
+                  className="group flex w-full items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.02] px-4 py-3.5 text-left transition-all hover:border-white/20 hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="flex items-center gap-3 text-[14px] text-ink-50">
+                    {w.icon ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={w.icon} alt="" className="h-4.5 w-4.5 rounded" width={18} height={18} />
+                    ) : (
+                      <WalletIcon size={17} className="text-ink-300" />
+                    )}
+                    {w.name}
+                  </span>
+                  {busy === `wallet:${w.name}` ? (
+                    <Loader2 size={16} className="animate-spin text-ink-300" />
+                  ) : (
+                    <ArrowRight
+                      size={16}
+                      className="text-ink-400 transition-all group-hover:translate-x-0.5 group-hover:text-ink-100"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="px-1 text-[12.5px] leading-relaxed text-ink-400">
+              No Sui wallet detected.{" "}
+              <a
+                href="https://slush.app"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink-100 underline-offset-4 hover:underline"
+              >
+                Install Slush
+              </a>{" "}
+              to connect with a wallet.
+            </p>
+          )}
 
           {error && (
             <p className="px-1 pt-1 text-[12.5px] leading-relaxed text-[var(--color-danger)]">

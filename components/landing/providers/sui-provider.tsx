@@ -86,17 +86,16 @@ function RegisterEnokiWallets() {
 /**
  * Reconciles the mock app-session flag with the real wallet.
  *
- * On reload, WalletProvider autoConnect silently restores the zkLogin account
- * from IndexedDB without ever running the login modal — so auth.signIn() (the
- * localStorage flag the dashboard/nav read) would stay false and the UI would
- * show "Connected" over a signed-out app state. When zkLogin is configured, the
- * live account is the source of truth: mirror it into the mock flag.
+ * On reload, WalletProvider autoConnect silently restores the connected account
+ * (zkLogin from IndexedDB, or an external wallet like Slush) without ever
+ * running the login modal — so auth.signIn() (the localStorage flag the
+ * dashboard/nav read) would stay false and the UI would show "Connected" over a
+ * signed-out app state. Any live account is the source of truth: mirror it.
  */
 function ZkLoginAuthBridge() {
   const account = useCurrentAccount();
 
   useEffect(() => {
-    if (!isZkLoginConfigured()) return;
     if (account && !auth.isSignedIn()) auth.signIn();
   }, [account]);
 

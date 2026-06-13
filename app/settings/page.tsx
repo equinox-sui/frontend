@@ -37,14 +37,26 @@ export default function SettingsPage() {
   const { disconnect } = useZkLogin();
   const session = useZkLoginSession();
 
-  // Prefer the real zkLogin identity; fall back to mock for the unconfigured demo.
-  const email = session.email ?? mockUser.email;
+  // Prefer the real connected identity; fall back to mock for the demo.
   const suiAddress = session.address ?? mockUser.suiAddress;
-  const sessionLabel = session.isZkLogin
-    ? session.expiresAt
-      ? `zkLogin · expires in ${formatRemaining(session.expiresAt)}`
-      : "zkLogin · active"
-    : "Demo session (mock)";
+  // Only fall back to the mock email when there is no real session at all.
+  // A real zkLogin/wallet account with no email claim shows a neutral dash —
+  // never a fabricated demo address.
+  const email = session.email ?? (session.kind ? "—" : mockUser.email);
+  const emailHint =
+    session.kind === "zklogin"
+      ? "From your zkLogin provider"
+      : session.kind === "wallet"
+        ? "Wallet connection — no email"
+        : "Demo account";
+  const sessionLabel =
+    session.kind === "zklogin"
+      ? session.expiresAt
+        ? `zkLogin · expires in ${formatRemaining(session.expiresAt)}`
+        : "zkLogin · active"
+      : session.kind === "wallet"
+        ? `Wallet · ${session.walletName ?? "Connected"}`
+        : "Demo session (mock)";
 
   const copy = async () => {
     await navigator.clipboard.writeText(suiAddress);
@@ -53,7 +65,7 @@ export default function SettingsPage() {
   };
 
   const handleLogOut = async () => {
-    if (session.isZkLogin) await disconnect();
+    if (session.kind) await disconnect();
     auth.signOut();
     window.location.href = "/";
   };
@@ -71,11 +83,7 @@ export default function SettingsPage() {
         </header>
 
         <Section title="Account" intro="Identity for this device.">
-          <Row
-            k="Email"
-            v={email}
-            hint={session.isZkLogin ? "From your zkLogin provider" : "Demo account"}
-          />
+          <Row k="Email" v={email} hint={emailHint} />
           <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4 last:border-0">
             <div className="min-w-0">
               <div className="text-[13.5px] text-fg">Sui address</div>
@@ -189,7 +197,7 @@ export default function SettingsPage() {
                     "Delete your account? This removes your profile and signs you out.",
                   )
                 ) {
-                  if (session.isZkLogin) await disconnect();
+                  if (session.kind) await disconnect();
                   auth.signOut();
                   window.location.href = "/";
                 }
