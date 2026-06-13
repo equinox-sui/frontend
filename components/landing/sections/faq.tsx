@@ -18,8 +18,8 @@ export function FAQ() {
 
       const mm = gsap.matchMedia();
 
-      // Reduced-motion (any width): no pin, no scrub — show the expanded card
-      // statically with everything already visible.
+      // Reduced-motion (any width): no pin, no scrub — expanded card flows
+      // naturally with everything already visible.
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set(".faq-window", { width: "100%", height: "auto" });
         gsap.set(".faq-mini", { display: "none" });
@@ -30,110 +30,114 @@ export function FAQ() {
         });
       });
 
-      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: pinRef.current!,
-            start: "top top",
-            end: "+=120%",
-            scrub: 0.6,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
+      mm.add(
+        "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+        () => {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: pinRef.current!,
+              start: "top top",
+              end: "+=120%",
+              scrub: 0.6,
+              pin: true,
+              anticipatePin: 1,
+            },
+          });
 
-        // Card grows to fullscreen
-        tl.to(
-          ".faq-window",
-          {
-            width: "100vw",
-            height: "100vh",
-            borderRadius: 0,
-            ease: "power2.inOut",
-            duration: 0.6,
-          },
-          0
-        );
+          // Mini chip grows into a fullscreen panel.
+          tl.to(
+            ".faq-window",
+            {
+              width: "100vw",
+              height: "100vh",
+              borderRadius: 0,
+              ease: "power2.inOut",
+              duration: 0.6,
+            },
+            0,
+          );
+          tl.to(
+            ".faq-mini",
+            { opacity: 0, scale: 0.85, ease: "power2.in", duration: 0.25 },
+            0,
+          );
+          tl.fromTo(
+            ".faq-expanded",
+            { opacity: 0 },
+            { opacity: 1, duration: 0.2 },
+            0.4,
+          );
+          tl.fromTo(
+            ".faq-headline-word",
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, stagger: 0.06, ease: "expo.out", duration: 0.3 },
+            0.5,
+          );
+          tl.fromTo(
+            ".faq-item",
+            { opacity: 0, y: 18 },
+            { opacity: 1, y: 0, stagger: 0.05, ease: "expo.out", duration: 0.35 },
+            0.7,
+          );
+          tl.fromTo(
+            ".faq-footer",
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, ease: "expo.out", duration: 0.25 },
+            0.95,
+          );
 
-        tl.to(
-          ".faq-mini",
-          { opacity: 0, scale: 0.85, ease: "power2.in", duration: 0.25 },
-          0
-        );
+          return () => {
+            tl.scrollTrigger?.kill();
+            tl.kill();
+          };
+        },
+      );
 
-        tl.fromTo(
-          ".faq-expanded",
-          { opacity: 0 },
-          { opacity: 1, duration: 0.2 },
-          0.4
-        );
+      // Mobile (motion ok): no pin, natural flow with simple fades.
+      mm.add(
+        "(max-width: 1023px) and (prefers-reduced-motion: no-preference)",
+        () => {
+          gsap.set(".faq-window", { width: "100%", height: "auto" });
+          gsap.set(".faq-mini", { display: "none" });
+          gsap.set(".faq-expanded", { opacity: 1, position: "static" });
 
-        tl.fromTo(
-          ".faq-headline-word",
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, stagger: 0.06, ease: "expo.out", duration: 0.3 },
-          0.5
-        );
-
-        tl.fromTo(
-          ".faq-item",
-          { opacity: 0, y: 18 },
-          { opacity: 1, y: 0, stagger: 0.05, ease: "expo.out", duration: 0.35 },
-          0.7
-        );
-
-        tl.fromTo(
-          ".faq-footer",
-          { opacity: 0, y: 12 },
-          { opacity: 1, y: 0, ease: "expo.out", duration: 0.25 },
-          0.95
-        );
-
-        return () => {
-          tl.scrollTrigger?.kill();
-          tl.kill();
-        };
-      });
-
-      // Mobile (motion ok): no pin, just show content with simple fades
-      mm.add("(max-width: 1023px) and (prefers-reduced-motion: no-preference)", () => {
-        gsap.set(".faq-window", { width: "100%", height: "auto" });
-        gsap.set(".faq-mini", { display: "none" });
-        gsap.set(".faq-expanded", { opacity: 1, position: "static" });
-
-        gsap.fromTo(
-          ".faq-headline-word",
-          { opacity: 0, y: 18 },
-          {
-            opacity: 1,
-            y: 0,
-            stagger: 0.08,
-            duration: 0.7,
-            ease: "expo.out",
-            scrollTrigger: { trigger: sectionRef.current!, start: "top 75%" },
-          }
-        );
-        gsap.fromTo(
-          ".faq-item",
-          { opacity: 0, y: 18 },
-          {
-            opacity: 1,
-            y: 0,
-            stagger: 0.06,
-            duration: 0.6,
-            ease: "expo.out",
-            scrollTrigger: { trigger: ".faq-list", start: "top 85%" },
-          }
-        );
-      });
+          gsap.fromTo(
+            ".faq-headline-word",
+            { opacity: 0, y: 18 },
+            {
+              opacity: 1,
+              y: 0,
+              stagger: 0.08,
+              duration: 0.7,
+              ease: "expo.out",
+              scrollTrigger: { trigger: sectionRef.current!, start: "top 75%" },
+            },
+          );
+          gsap.fromTo(
+            ".faq-item",
+            { opacity: 0, y: 18 },
+            {
+              opacity: 1,
+              y: 0,
+              stagger: 0.06,
+              duration: 0.6,
+              ease: "expo.out",
+              scrollTrigger: { trigger: ".faq-list", start: "top 85%" },
+            },
+          );
+        },
+      );
 
       return () => {
         mm.revert();
         ScrollTrigger.refresh();
       };
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
+
+  const toggle = (i: number) =>
+    setOpenIdx((curr) => (curr === i ? null : i));
 
   return (
     <section id="faq" ref={sectionRef} className="relative bg-bg">
@@ -163,11 +167,14 @@ export function FAQ() {
             </div>
           </div>
 
-          {/* Expanded state */}
+          {/* Expanded state — fixed header + footer, the question list owns the
+              middle and scrolls internally only when an open answer overflows.
+              No mt-auto on the footer (that pushed it past the card edge before),
+              so nothing overlaps or gets clipped and the footer is always shown. */}
           <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
-            <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col px-7 pt-14 pb-4 sm:px-12 sm:pt-16 lg:px-20 lg:pt-16 lg:pb-5">
+            <div className="mx-auto flex h-full w-full max-w-[1400px] flex-col px-7 pb-6 pt-[5vh] sm:px-12 lg:px-20 lg:pt-[5.5vh]">
               <h2
-                className="shrink-0 text-center text-[clamp(2rem,4.2vw,4.25rem)] font-normal leading-[1.05] tracking-[-0.015em] text-[#0a0a0a]"
+                className="shrink-0 text-center text-[clamp(1.4rem,2.6vw,2.4rem)] font-normal leading-[1.05] tracking-[-0.015em] text-[#0a0a0a]"
                 style={{
                   fontFamily:
                     "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
@@ -182,10 +189,11 @@ export function FAQ() {
                 </span>
               </h2>
 
-              {/* Inline on mobile; on the pinned desktop window the list owns
-                  the remaining height and scrolls internally so a long open
-                  answer never pushes the footer off-screen on short laptops. */}
-              <div className="faq-list mx-auto mt-8 w-full max-w-[820px] space-y-1.5 sm:mt-10 sm:space-y-2 lg:mt-10 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 [scrollbar-width:thin]">
+              {/* Natural flow, no internal scroll (that clipped rows mid-row).
+                  The compact, top-aligned layout fits all 7 questions + one open
+                  answer inside the fullscreen card, with slack below the footer
+                  that an opening answer grows into — so nothing sinks or cuts. */}
+              <div className="faq-list mx-auto mt-5 w-full max-w-[820px] space-y-1.5 sm:mt-6">
                 {faq.items.map((item, i) => {
                   const isOpen = openIdx === i;
                   return (
@@ -199,11 +207,9 @@ export function FAQ() {
                     >
                       <button
                         type="button"
-                        onClick={() =>
-                          setOpenIdx((curr) => (curr === i ? null : i))
-                        }
+                        onClick={() => toggle(i)}
                         aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-2.5 text-left sm:px-9 sm:py-3"
+                        className="flex w-full items-center justify-between gap-5 rounded-full px-7 py-2 text-left sm:px-9 sm:py-2.5"
                       >
                         <span
                           className="text-[15px] font-normal leading-snug text-[#0a0a0a] sm:text-[17px] lg:text-[18px]"
@@ -216,19 +222,19 @@ export function FAQ() {
                         </span>
                         <span
                           aria-hidden
-                          className="grid size-11 shrink-0 place-items-center rounded-full text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] sm:size-12"
+                          className="grid size-9 shrink-0 place-items-center rounded-full text-white shadow-[0_-4px_8px_rgba(255,255,255,0.25)_inset] sm:size-10"
                           style={{ background: "var(--gradient-brand)" }}
                         >
                           {isOpen ? (
-                            <Minus className="size-[18px]" />
+                            <Minus className="size-4" />
                           ) : (
-                            <Plus className="size-[18px]" />
+                            <Plus className="size-4" />
                           )}
                         </span>
                       </button>
                       {isOpen && (
                         <div
-                          className="px-7 pb-3.5 pt-0.5 text-[13.5px] font-normal leading-relaxed text-[#0a0a0a]/70 sm:px-9 sm:pb-4 lg:text-[14.5px]"
+                          className="px-7 pb-3 pt-0.5 text-[13px] font-normal leading-relaxed text-[#0a0a0a]/70 sm:px-9 lg:text-[14px]"
                           style={{
                             fontFamily:
                               "var(--font-tech), ui-sans-serif, system-ui",
@@ -242,13 +248,11 @@ export function FAQ() {
                 })}
               </div>
 
-              {/* Footer — anchored to the bottom of the window so it never clips */}
-              <div className="faq-footer mt-auto flex shrink-0 flex-col items-start justify-between gap-4 pt-6 sm:flex-row sm:items-center sm:gap-5">
+              <div className="faq-footer mt-7 flex shrink-0 flex-col items-start justify-between gap-4 sm:flex-row sm:items-center sm:gap-5">
                 <div
                   className="flex max-w-xl items-start gap-3 text-[13px] leading-snug text-[#0a0a0a]/55 sm:text-[14px] lg:text-[15px]"
                   style={{
-                    fontFamily:
-                      "var(--font-tech), ui-sans-serif, system-ui",
+                    fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
                   }}
                 >
                   <Plus className="mt-0.5 size-4 shrink-0" />
@@ -273,8 +277,7 @@ export function FAQ() {
                   <span
                     className="text-[13px] font-semibold leading-tight sm:text-[14px]"
                     style={{
-                      fontFamily:
-                        "var(--font-tech), ui-sans-serif, system-ui",
+                      fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
                     }}
                   >
                     Any Questions? Ask
