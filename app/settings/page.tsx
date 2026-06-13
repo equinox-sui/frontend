@@ -8,10 +8,16 @@ import { Button } from "@/components/ui/Button";
 import { mockUser } from "@/data/mock";
 import { shortAddress } from "@/lib/format";
 import { auth } from "@/lib/auth";
+import { useZkLogin, useZkLoginSession } from "@/lib/sui/useZkLogin";
 
-function logOut() {
-  auth.signOut();
-  window.location.href = "/";
+/** "11h 42m" / "42m" / "expired" from an epoch-ms expiry. */
+function formatRemaining(expiresAt: number): string {
+  const ms = expiresAt - Date.now();
+  if (ms <= 0) return "expired";
+  const totalMin = Math.floor(ms / 60_000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
 const NOTIFY = [
@@ -28,10 +34,28 @@ export default function SettingsPage() {
   const [currency, setCurrency] = useState("USD");
   const [theme, setTheme] = useState("Dark");
 
+  const { disconnect } = useZkLogin();
+  const session = useZkLoginSession();
+
+  // Prefer the real zkLogin identity; fall back to mock for the unconfigured demo.
+  const email = session.email ?? mockUser.email;
+  const suiAddress = session.address ?? mockUser.suiAddress;
+  const sessionLabel = session.isZkLogin
+    ? session.expiresAt
+      ? `zkLogin · expires in ${formatRemaining(session.expiresAt)}`
+      : "zkLogin · active"
+    : "Demo session (mock)";
+
   const copy = async () => {
-    await navigator.clipboard.writeText(mockUser.suiAddress);
+    await navigator.clipboard.writeText(suiAddress);
     setCopied(true);
     setTimeout(() => setCopied(false), 1400);
+  };
+
+  const handleLogOut = async () => {
+    if (session.isZkLogin) await disconnect();
+    auth.signOut();
+    window.location.href = "/";
   };
 
   return (
@@ -47,12 +71,16 @@ export default function SettingsPage() {
         </header>
 
         <Section title="Account" intro="Identity for this device.">
-          <Row k="Email" v={mockUser.email} hint="From your zkLogin provider" />
+          <Row
+            k="Email"
+            v={email}
+            hint={session.isZkLogin ? "From your zkLogin provider" : "Demo account"}
+          />
           <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-4 last:border-0">
             <div className="min-w-0">
               <div className="text-[13.5px] text-fg">Sui address</div>
               <div className="mt-1 font-mono text-[11.5px] text-fg-dim">
-                {shortAddress(mockUser.suiAddress, 10, 8)}
+                {shortAddress(suiAddress, 10, 8)}
               </div>
             </div>
             <button
@@ -63,7 +91,7 @@ export default function SettingsPage() {
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
-          <Row k="Session" v="zkLogin · expires in 11h 42m" />
+          <Row k="Session" v={sessionLabel} />
         </Section>
 
         <Section
@@ -155,12 +183,13 @@ export default function SettingsPage() {
               k="Delete account"
               hint="Removes your profile from Equinox. You'll need to re-onboard to use the agent again."
               cta="Delete"
-              onAction={() => {
+              onAction={async () => {
                 if (
                   window.confirm(
                     "Delete your account? This removes your profile and signs you out.",
                   )
                 ) {
+                  if (session.isZkLogin) await disconnect();
                   auth.signOut();
                   window.location.href = "/";
                 }
@@ -173,7 +202,7 @@ export default function SettingsPage() {
           <span className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-fg-dim">
             v0.1.0 · build a7c4d2
           </span>
-          <Button variant="outline" size="sm" className="!h-9" onClick={logOut}>
+          <Button variant="outline" size="sm" className="!h-9" onClick={handleLogOut}>
             <LogOut size={13} />
             Log out
           </Button>

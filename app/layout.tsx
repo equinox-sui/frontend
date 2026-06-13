@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif, Space_Grotesk } from "next/font/google";
 import { LenisProvider } from "@/components/landing/providers/lenis-provider";
-// import { PrivyAppProvider } from "@/components/landing/providers/privy-provider";
-// ^ Uncomment after installing Privy with pnpm (see PRIVY_SETUP.md).
+import { SuiProvider } from "@/components/landing/providers/sui-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -63,9 +62,11 @@ export default function RootLayout({
           aria-hidden
           className="pointer-events-none fixed inset-0 z-0 bg-noise opacity-[0.05] mix-blend-overlay"
         />
-        <LenisProvider>
-          <div className="relative z-10 flex min-h-screen flex-col">{children}</div>
-        </LenisProvider>
+        <SuiProvider>
+          <LenisProvider>
+            <div className="relative z-10 flex min-h-screen flex-col">{children}</div>
+          </LenisProvider>
+        </SuiProvider>
       </body>
     </html>
   );
