@@ -52,6 +52,12 @@ export function Hero() {
           "-=0.85"
         );
 
+      // Stop here for reduced-motion users: the entrance above self-completes,
+      // but the infinite idle loops below (bob/sway/orbits/sonar/glow/drift/
+      // twinkle) + the mouse-parallax tilt must not run. GSAP's rAF tweens are
+      // unaffected by the CSS prefers-reduced-motion rule, so gate them here.
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
       // === Coin idle motion ===
       // Vertical bob
       gsap.to("[data-float]", {

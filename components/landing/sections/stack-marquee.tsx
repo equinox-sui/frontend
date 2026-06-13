@@ -53,6 +53,26 @@ export function StackMarquee({ variant = "default" }: Props) {
       const track = trackRef.current;
       if (!track) return;
 
+      // Section enter — fade strip in (a one-shot, fine under reduced motion).
+      gsap.fromTo(
+        ".stack-strip",
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "expo.out",
+          scrollTrigger: { trigger: ref.current, start: "top 85%" },
+        }
+      );
+
+      // Reduced motion: no looping marquee or drifting blobs — show the strip
+      // statically (GSAP rAF tweens ignore the CSS reduced-motion rule).
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(track, { x: 0 });
+        return;
+      }
+
       const half = track.scrollWidth / 2;
       // Left → Right motion: track goes from -half to 0, loops seamlessly because
       // content is duplicated so the visible window stays continuous.
@@ -92,19 +112,6 @@ export function StackMarquee({ variant = "default" }: Props) {
         yoyo: true,
         ease: "sine.inOut",
       });
-
-      // Section enter — fade strip in
-      gsap.fromTo(
-        ".stack-strip",
-        { opacity: 0, y: 24 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: "expo.out",
-          scrollTrigger: { trigger: ref.current, start: "top 85%" },
-        }
-      );
 
       // Pause on hover
       const onEnter = () => tween.timeScale(0.25);

@@ -18,7 +18,19 @@ export function FAQ() {
 
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 1024px)", () => {
+      // Reduced-motion (any width): no pin, no scrub — show the expanded card
+      // statically with everything already visible.
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(".faq-window", { width: "100%", height: "auto" });
+        gsap.set(".faq-mini", { display: "none" });
+        gsap.set(".faq-expanded", { opacity: 1, position: "static" });
+        gsap.set([".faq-headline-word", ".faq-item", ".faq-footer"], {
+          opacity: 1,
+          y: 0,
+        });
+      });
+
+      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: pinRef.current!,
@@ -83,8 +95,8 @@ export function FAQ() {
         };
       });
 
-      // Mobile: no pin, just show content with simple fades
-      mm.add("(max-width: 1023px)", () => {
+      // Mobile (motion ok): no pin, just show content with simple fades
+      mm.add("(max-width: 1023px) and (prefers-reduced-motion: no-preference)", () => {
         gsap.set(".faq-window", { width: "100%", height: "auto" });
         gsap.set(".faq-mini", { display: "none" });
         gsap.set(".faq-expanded", { opacity: 1, position: "static" });
@@ -153,7 +165,7 @@ export function FAQ() {
 
           {/* Expanded state */}
           <div className="faq-expanded absolute inset-0 flex flex-col opacity-0">
-            <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-7 pt-16 pb-4 sm:px-12 sm:pt-20 lg:px-20 lg:pt-24 lg:pb-5">
+            <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col px-7 pt-14 pb-4 sm:px-12 sm:pt-16 lg:px-20 lg:pt-16 lg:pb-5">
               <h2
                 className="shrink-0 text-center text-[clamp(2rem,4.2vw,4.25rem)] font-normal leading-[1.05] tracking-[-0.015em] text-[#0a0a0a]"
                 style={{
@@ -170,8 +182,10 @@ export function FAQ() {
                 </span>
               </h2>
 
-              {/* All items rendered inline — no inner scroll */}
-              <div className="faq-list mx-auto mt-12 w-full max-w-[820px] space-y-1.5 sm:mt-14 sm:space-y-2 lg:mt-16">
+              {/* Inline on mobile; on the pinned desktop window the list owns
+                  the remaining height and scrolls internally so a long open
+                  answer never pushes the footer off-screen on short laptops. */}
+              <div className="faq-list mx-auto mt-8 w-full max-w-[820px] space-y-1.5 sm:mt-10 sm:space-y-2 lg:mt-10 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 [scrollbar-width:thin]">
                 {faq.items.map((item, i) => {
                   const isOpen = openIdx === i;
                   return (

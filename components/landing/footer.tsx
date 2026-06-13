@@ -21,6 +21,35 @@ function backToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+const FOOTER_LINK_CLASS =
+  "text-[15px] font-semibold uppercase tracking-[0.08em] text-fg transition-colors hover:text-fg-muted";
+
+/**
+ * Route-aware footer link: external URLs open in a new tab, in-app routes use
+ * <Link> for client-side nav (no full reload), and hash anchors stay plain.
+ */
+function FooterLink({ href, label }: { href: string; label: string }) {
+  if (/^https?:/.test(href)) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" className={FOOTER_LINK_CLASS}>
+        {label}
+      </a>
+    );
+  }
+  if (href.startsWith("#")) {
+    return (
+      <a href={href} className={FOOTER_LINK_CLASS}>
+        {label}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={FOOTER_LINK_CLASS}>
+      {label}
+    </Link>
+  );
+}
+
 export function Footer() {
   return (
     <footer className="relative isolate overflow-hidden bg-bg pt-20 sm:pt-24">
@@ -55,23 +84,11 @@ export function Footer() {
                 "var(--font-tech), ui-sans-serif, system-ui",
             }}
           >
-            {navLeft.map((link) => {
-              const external = /^https?:/.test(link.href);
-              const Comp = external ? "a" : "a";
-              return (
-                <li key={link.label}>
-                  <Comp
-                    href={link.href}
-                    {...(external
-                      ? { target: "_blank", rel: "noreferrer" }
-                      : {})}
-                    className="text-[15px] font-semibold uppercase tracking-[0.08em] text-fg transition-colors hover:text-fg-muted"
-                  >
-                    {link.label}
-                  </Comp>
-                </li>
-              );
-            })}
+            {navLeft.map((link) => (
+              <li key={link.label}>
+                <FooterLink href={link.href} label={link.label} />
+              </li>
+            ))}
           </ul>
 
           {/* Nav column 2 */}
@@ -84,14 +101,7 @@ export function Footer() {
           >
             {navRight.map((link) => (
               <li key={link.label}>
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[15px] font-semibold uppercase tracking-[0.08em] text-fg transition-colors hover:text-fg-muted"
-                >
-                  {link.label}
-                </a>
+                <FooterLink href={link.href} label={link.label} />
               </li>
             ))}
           </ul>

@@ -20,7 +20,19 @@ export function HowAuralis() {
 
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 1024px)", () => {
+      // Reduced motion: no pin/scrub — cards are already in their final
+      // position; just make sure title + cards are fully visible.
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set([".how-title", ".how-card", ".how-card-left", ".how-card-right"], {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          xPercent: 0,
+          scale: 1,
+        });
+      });
+
+      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: ref.current!,
@@ -57,7 +69,7 @@ export function HowAuralis() {
         };
       });
 
-      mm.add("(max-width: 1023px)", () => {
+      mm.add("(max-width: 1023px) and (prefers-reduced-motion: no-preference)", () => {
         gsap.fromTo(
           ".how-title",
           { opacity: 0, y: 24 },
