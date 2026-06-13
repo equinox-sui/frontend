@@ -2,22 +2,14 @@
 
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { ArrowUpRight, Lock, Repeat, Wallet } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { gsap, ScrollTrigger, registerGsap } from "@/lib/gsap";
 import { whatYouCanDo } from "@/lib/content";
 import { DepositChart } from "../visuals/deposit-chart";
 import { ReputationGauge } from "../visuals/reputation-gauge";
 import { BadgeStack } from "../visuals/badge-stack";
 
-const TECH: React.CSSProperties = {
-  fontFamily: "var(--font-tech), ui-sans-serif, system-ui",
-};
-
-const META = [
-  { num: "01", kicker: "Deposit", tag: "Untouched", icon: Lock, accent: "#5cd8ff" },
-  { num: "02", kicker: "Borrow + recycle", tag: "Automatic", icon: Repeat, accent: "#b6a8ff" },
-  { num: "03", kicker: "Withdraw", tag: "Spendable", icon: Wallet, accent: "#ff9aae" },
-] as const;
+const VISUALS = [DepositChart, ReputationGauge, BadgeStack] as const;
 
 export function WhatYouCanDo() {
   const ref = useRef<HTMLElement>(null);
@@ -27,11 +19,7 @@ export function WhatYouCanDo() {
       registerGsap();
       if (!ref.current) return;
 
-      const reduced = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
-
-      // Char-level title reveal (line-masked).
+      // Char-level title reveal (line-masked)
       gsap.fromTo(
         ".wycd-char",
         { yPercent: 110, opacity: 0 },
@@ -39,64 +27,110 @@ export function WhatYouCanDo() {
           yPercent: 0,
           opacity: 1,
           stagger: 0.018,
-          duration: reduced ? 0.001 : 0.9,
+          duration: 0.95,
           ease: "expo.out",
-          scrollTrigger: { trigger: ref.current, start: "top 80%" },
+          scrollTrigger: { trigger: ref.current, start: "top 78%" },
         }
       );
 
-      // Bento tiles rise + fade, slightly out of lockstep so it doesn't read
-      // as a uniform grid pop.
+      // Card enter: lift + scale + slight rotateX
       gsap.fromTo(
-        ".wycd-tile",
-        { opacity: 0, y: 56, scale: 0.97 },
+        ".wycd-card",
+        { opacity: 0, y: 70, scale: 0.95, rotateX: 8 },
         {
           opacity: 1,
           y: 0,
           scale: 1,
-          stagger: 0.14,
-          duration: reduced ? 0.001 : 1,
+          rotateX: 0,
+          stagger: 0.12,
+          duration: 1.05,
           ease: "expo.out",
           scrollTrigger: { trigger: ".wycd-grid", start: "top 82%" },
         }
       );
 
-      if (!reduced) {
-        // The pipeline rail "flows" — dash offset travels the connector once
-        // the grid is in view, then the flow dots pulse along it.
-        gsap.fromTo(
-          ".wycd-rail-path",
-          { strokeDashoffset: 240 },
-          {
-            strokeDashoffset: 0,
-            duration: 1.3,
-            ease: "power2.out",
-            scrollTrigger: { trigger: ".wycd-grid", start: "top 75%" },
-          }
-        );
-        gsap.utils.toArray<HTMLElement>(".wycd-flow").forEach((el, i) => {
-          gsap.to(el, {
-            opacity: 0.25,
-            duration: 1.2 + (i % 3) * 0.3,
-            delay: i * 0.4,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-          });
+      // Visual: scale in nested behind the card
+      gsap.fromTo(
+        ".wycd-visual",
+        { opacity: 0, scale: 0.9 },
+        {
+          opacity: 1,
+          scale: 1,
+          stagger: 0.12,
+          duration: 1.2,
+          delay: 0.25,
+          ease: "expo.out",
+          scrollTrigger: { trigger: ".wycd-grid", start: "top 82%" },
+        }
+      );
+
+      // Card-text reveal: title slide-up + body fade
+      gsap.fromTo(
+        ".wycd-card-title",
+        { y: 18, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.12,
+          duration: 0.7,
+          delay: 0.4,
+          ease: "expo.out",
+          scrollTrigger: { trigger: ".wycd-grid", start: "top 82%" },
+        }
+      );
+      gsap.fromTo(
+        ".wycd-card-body",
+        { y: 18, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.12,
+          duration: 0.7,
+          delay: 0.55,
+          ease: "expo.out",
+          scrollTrigger: { trigger: ".wycd-grid", start: "top 82%" },
+        }
+      );
+
+      // Scrub parallax — cards float subtly as page scrolls
+      const cards = gsap.utils.toArray<HTMLElement>(".wycd-card");
+      cards.forEach((card, i) => {
+        gsap.to(card, {
+          y: -12 - i * 4,
+          ease: "none",
+          scrollTrigger: {
+            trigger: card,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.6,
+          },
         });
-      }
+      });
+
+      // Border sweep highlight on enter
+      gsap.fromTo(
+        ".wycd-border-sweep",
+        { opacity: 0 },
+        {
+          opacity: 1,
+          stagger: 0.12,
+          duration: 0.9,
+          delay: 0.3,
+          ease: "power2.out",
+          scrollTrigger: { trigger: ".wycd-grid", start: "top 82%" },
+        }
+      );
 
       return () => {
         ScrollTrigger.getAll().forEach((st) => {
-          if (st.trigger && ref.current?.contains(st.trigger as Element))
+          if (st.trigger && ref.current?.contains(st.trigger as Element)) {
             st.kill();
+          }
         });
       };
     },
     { scope: ref }
   );
-
-  const cards = whatYouCanDo.cards;
 
   return (
     <section
@@ -104,217 +138,199 @@ export function WhatYouCanDo() {
       ref={ref}
       className="relative isolate overflow-hidden py-28 sm:py-36"
     >
-      <div className="mx-auto max-w-[1240px] px-6 lg:px-10">
-        {/* Header — left aligned, asymmetric (not centered) */}
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <h2
-            className="max-w-[14ch] text-[clamp(2rem,5vw,4rem)] font-medium leading-[1.02] tracking-[-0.02em] text-fg"
-            style={{
-              fontFamily:
-                "var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system",
-            }}
-          >
-            {whatYouCanDo.title.split(" ").map((word, wi) => (
-              <span
-                key={wi}
-                className="mr-[0.24em] inline-flex overflow-hidden align-baseline"
-              >
-                {word.split("").map((ch, ci) => (
-                  <span
-                    key={ci}
-                    className="wycd-char inline-block will-change-transform"
+      <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
+        <h2
+          className="text-center text-[clamp(2rem,5.4vw,4.4rem)] font-medium leading-[1.05] tracking-[-0.02em] text-fg"
+          style={{
+            fontFamily:
+              "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
+          }}
+        >
+          {whatYouCanDo.title.split(" ").map((word, wi) => (
+            <span
+              key={wi}
+              className="mr-[0.24em] inline-flex overflow-hidden align-baseline"
+            >
+              {word.split("").map((ch, ci) => (
+                <span
+                  key={ci}
+                  className="wycd-char inline-block will-change-transform"
+                >
+                  {ch}
+                </span>
+              ))}
+            </span>
+          ))}
+        </h2>
+
+        <div className="wycd-grid mt-20 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+          {whatYouCanDo.cards.map((c, i) => {
+            const Visual = VISUALS[i];
+            return (
+              <TiltCard key={c.name}>
+                <article
+                  className="wycd-card group relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-border-strong bg-surface/45 p-6 backdrop-blur-md transition-colors duration-500 hover:bg-surface/65 sm:p-7 will-change-transform [transform-style:preserve-3d]"
+                >
+                  {/* Border sweep gradient overlay (enter animation) */}
+                  <div
+                    aria-hidden
+                    className="wycd-border-sweep pointer-events-none absolute inset-0 rounded-[2rem]"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, rgba(145,129,245,0.0), rgba(145,129,245,0.18) 40%, rgba(64,122,255,0.10) 70%, transparent)",
+                      mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                      WebkitMask:
+                        "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                      WebkitMaskComposite: "xor",
+                      maskComposite: "exclude",
+                      padding: 1,
+                    }}
+                  />
+
+                  {/* Cursor-follow glow */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 rounded-[2rem] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    style={{
+                      background:
+                        "radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(145,129,245,0.18), transparent 50%)",
+                    }}
+                  />
+
+                  {/* Hover arrow chip */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute right-5 top-5 z-10 grid size-9 translate-y-2 place-items-center rounded-full border border-border-strong bg-bg/80 text-fg opacity-0 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100"
                   >
-                    {ch}
-                  </span>
-                ))}
-              </span>
-            ))}
-          </h2>
-          <p
-            className="max-w-sm text-[14.5px] leading-relaxed text-fg-muted lg:pb-2 lg:text-right"
-            style={TECH}
-          >
-            One deposit becomes a self-repaying loan. Follow the money through
-            the three balances the agent manages on your behalf.
-          </p>
-        </div>
+                    <ArrowUpRight className="size-4" />
+                  </div>
 
-        {/* Bento — one tall tile + two stacked, with a flowing pipeline rail */}
-        <div className="wycd-grid relative mt-16 grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
-          {/* Connector rail (desktop only) */}
-          <svg
-            aria-hidden
-            className="pointer-events-none absolute inset-0 z-0 hidden h-full w-full lg:block"
-            preserveAspectRatio="none"
-            viewBox="0 0 100 100"
-          >
-            <defs>
-              <linearGradient id="wycd-rail" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0%" stopColor="#5cd8ff" />
-                <stop offset="50%" stopColor="#9181f5" />
-                <stop offset="100%" stopColor="#ff7a90" />
-              </linearGradient>
-            </defs>
-            <path
-              className="wycd-rail-path"
-              d="M 58 50 H 62"
-              fill="none"
-              stroke="url(#wycd-rail)"
-              strokeWidth="0.4"
-              strokeDasharray="240"
-              vectorEffect="non-scaling-stroke"
-              opacity="0.5"
-            />
-          </svg>
+                  {/* Visual */}
+                  <div
+                    className="wycd-visual relative aspect-[4/3] w-full overflow-hidden rounded-[1.25rem] border border-border bg-bg/70 transition-transform duration-700 ease-out [transform:translateZ(20px)] group-hover:scale-[1.025]"
+                  >
+                    {Visual ? <Visual /> : null}
+                    {/* Visual top sheen on hover */}
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-0 top-0 h-1/2 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      style={{
+                        background:
+                          "linear-gradient(to bottom, rgba(255,255,255,0.08), transparent)",
+                      }}
+                    />
+                  </div>
 
-          {/* Tile 01 — large hero, left, spans both rows */}
-          <BentoTile
-            metaIndex={0}
-            name={cards[0].name}
-            body={cards[0].body}
-            className="lg:col-span-7 lg:row-span-2"
-            visualClassName="aspect-[16/10] lg:aspect-[16/9]"
-            big
-          >
-            <DepositChart />
-          </BentoTile>
+                  <div className="relative mt-7 flex-1 [transform:translateZ(8px)]">
+                    <h3
+                      className="wycd-card-title flex items-center gap-2 text-lg font-semibold tracking-tight text-fg transition-transform duration-500 group-hover:translate-x-1 sm:text-xl"
+                      style={{
+                        fontFamily:
+                          "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
+                      }}
+                    >
+                      {c.name}
+                    </h3>
+                    <p
+                      className="wycd-card-body mt-3 text-sm leading-relaxed text-fg-muted sm:text-[15px]"
+                      style={{
+                        fontFamily:
+                          "var(--font-tech), ui-sans-serif, system-ui, -apple-system",
+                      }}
+                    >
+                      {c.body}
+                    </p>
+                  </div>
 
-          {/* Tile 02 — top right */}
-          <BentoTile
-            metaIndex={1}
-            name={cards[1].name}
-            body={cards[1].body}
-            className="lg:col-span-5"
-            visualClassName="aspect-[16/7]"
-          >
-            <ReputationGauge />
-          </BentoTile>
-
-          {/* Tile 03 — bottom right */}
-          <BentoTile
-            metaIndex={2}
-            name={cards[2].name}
-            body={cards[2].body}
-            className="lg:col-span-5"
-            visualClassName="aspect-[16/7]"
-          >
-            <BadgeStack />
-          </BentoTile>
+                  {/* Bottom accent line on hover */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-7 bottom-0 h-px scale-x-0 origin-left transition-transform duration-700 ease-out group-hover:scale-x-100"
+                    style={{ background: "var(--gradient-brand)" }}
+                  />
+                </article>
+              </TiltCard>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-function BentoTile({
-  metaIndex,
-  name,
-  body,
-  className,
-  visualClassName,
-  big,
-  children,
-}: {
-  metaIndex: number;
-  name: string;
-  body: string;
-  className?: string;
-  visualClassName?: string;
-  big?: boolean;
-  children: React.ReactNode;
-}) {
-  const m = META[metaIndex];
-  const Icon = m.icon;
+/**
+ * Lightweight mouse-tracked tilt + cursor variables.
+ * Updates --mx/--my for the radial-glow overlay and rotates the inner card
+ * on a perspective transform. Lerp smoothed via requestAnimationFrame.
+ */
+function TiltCard({ children }: { children: React.ReactNode }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const target = useRef({ rx: 0, ry: 0 });
+  const current = useRef({ rx: 0, ry: 0 });
+
+  const tick = () => {
+    const el = wrapRef.current;
+    if (!el) return;
+    current.current.rx += (target.current.rx - current.current.rx) * 0.12;
+    current.current.ry += (target.current.ry - current.current.ry) * 0.12;
+    el.style.setProperty("--rx", `${current.current.rx.toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${current.current.ry.toFixed(2)}deg`);
+    if (
+      Math.abs(target.current.rx - current.current.rx) > 0.01 ||
+      Math.abs(target.current.ry - current.current.ry) > 0.01
+    ) {
+      rafRef.current = requestAnimationFrame(tick);
+    } else {
+      rafRef.current = null;
+    }
+  };
+
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    el.style.setProperty("--mx", `${mx}px`);
+    el.style.setProperty("--my", `${my}px`);
+    const nx = (mx / rect.width - 0.5) * 2;
+    const ny = (my / rect.height - 0.5) * 2;
+    target.current.ry = nx * 5;
+    target.current.rx = -ny * 5;
+    if (rafRef.current === null) rafRef.current = requestAnimationFrame(tick);
+  };
+
+  const handleLeave = () => {
+    target.current.rx = 0;
+    target.current.ry = 0;
+    if (rafRef.current === null) rafRef.current = requestAnimationFrame(tick);
+  };
+
   return (
-    <article
-      className={`wycd-tile group relative z-10 flex flex-col overflow-hidden rounded-[1.75rem] border border-border-strong/60 bg-surface/45 p-6 backdrop-blur-md transition-colors duration-500 will-change-transform hover:border-border-strong sm:p-7 ${className ?? ""}`}
-      style={TECH}
+    <div
+      ref={wrapRef}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className="group/tilt h-full will-change-transform [perspective:1100px]"
+      style={
+        {
+          ["--mx" as string]: "50%",
+          ["--my" as string]: "50%",
+          ["--rx" as string]: "0deg",
+          ["--ry" as string]: "0deg",
+        } as React.CSSProperties
+      }
     >
-      {/* Oversized ghost numeral */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -right-2 -top-6 select-none font-medium leading-none text-white/[0.04]"
+      <div
+        className="h-full transition-transform duration-200 ease-out"
         style={{
-          fontSize: big ? "clamp(7rem,12vw,12rem)" : "clamp(5rem,8vw,8rem)",
-          fontFamily:
-            "var(--font-geist-sans), ui-sans-serif, system-ui",
+          transform: "rotateX(var(--rx)) rotateY(var(--ry))",
+          transformStyle: "preserve-3d",
         }}
       >
-        {m.num}
-      </span>
-
-      {/* Accent wash on hover */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -top-24 right-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
-        style={{ background: `${m.accent}26` }}
-      />
-
-      {/* Kicker row */}
-      <div className="relative flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <span
-            className="grid h-8 w-8 place-items-center rounded-lg border"
-            style={{
-              borderColor: `${m.accent}55`,
-              background: `${m.accent}14`,
-              color: m.accent,
-            }}
-          >
-            <Icon size={14} strokeWidth={1.9} />
-          </span>
-          <span className="text-[10.5px] uppercase tracking-[0.2em] text-fg-dim">
-            {m.kicker}
-          </span>
-        </div>
-        <span
-          className="rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-[0.14em]"
-          style={{
-            borderColor: `${m.accent}40`,
-            background: `${m.accent}12`,
-            color: m.accent,
-          }}
-        >
-          {m.tag}
-        </span>
-      </div>
-
-      {/* Visual */}
-      <div
-        className={`relative mt-6 w-full overflow-hidden rounded-[1.25rem] border border-border bg-bg/70 ${visualClassName ?? ""}`}
-      >
         {children}
-        {/* flow dot anchored to the visual edge — part of the pipeline motif */}
-        <span
-          className="wycd-flow absolute right-3 top-3 h-1.5 w-1.5 rounded-full"
-          style={{ background: m.accent, boxShadow: `0 0 8px ${m.accent}` }}
-          aria-hidden
-        />
       </div>
-
-      {/* Copy */}
-      <div className="relative mt-6 flex flex-1 flex-col">
-        <h3
-          className="flex items-center gap-2 text-[18px] font-semibold tracking-tight text-fg transition-transform duration-500 group-hover:translate-x-0.5 sm:text-xl"
-          style={TECH}
-        >
-          {name}
-        </h3>
-        <p
-          className="mt-2.5 max-w-prose text-[13.5px] leading-relaxed text-fg-muted sm:text-[14.5px]"
-          style={TECH}
-        >
-          {body}
-        </p>
-        <span
-          aria-hidden
-          className="mt-auto inline-flex w-fit items-center gap-1 pt-5 text-[12px] font-medium opacity-0 transition-all duration-500 group-hover:opacity-100"
-          style={{ color: m.accent }}
-        >
-          Learn more
-          <ArrowUpRight size={13} />
-        </span>
-      </div>
-    </article>
+    </div>
   );
 }
