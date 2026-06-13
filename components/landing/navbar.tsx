@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap, registerGsap } from "@/lib/gsap";
@@ -102,12 +103,14 @@ export function Navbar() {
           href="#top"
           className="nav-item absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2.5 text-sm font-semibold tracking-tight"
         >
-          <span
-            aria-hidden
-            className="grid size-7 place-items-center rounded-full ring-conic"
-          >
-            <span className="size-5 rounded-full bg-bg" />
-          </span>
+          <Image
+            src="/logo.png"
+            alt="Equinox"
+            width={28}
+            height={28}
+            priority
+            className="size-7 object-contain"
+          />
           <span className="hidden sm:inline">{nav.brand}</span>
         </Link>
 

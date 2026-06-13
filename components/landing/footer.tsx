@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUp } from "lucide-react";
 
 const navLeft = [
@@ -58,12 +59,13 @@ export function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2.5">
-              <span
-                aria-hidden
-                className="grid size-7 place-items-center rounded-full ring-conic"
-              >
-                <span className="size-5 rounded-full bg-bg" />
-              </span>
+              <Image
+                src="/logo.png"
+                alt="Equinox"
+                width={28}
+                height={28}
+                className="size-7 object-contain"
+              />
               <span
                 className="text-sm font-semibold tracking-wide text-fg"
                 style={{
